@@ -4,11 +4,11 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
-    <meta name="author" content="Franzua Plasencia">
+    <meta name="author" content="Franzua Plasencia - GitHub🤖: @plasenca">
     <meta name="generator" content="Hugo 0.101.0">
     {{ bootstrap.load_css() }}
     {{ moment.include_moment() }}
-    <title>Login - Grupo Coinp</title>
+    <title>Login</title>
 
 
     <style>
@@ -76,20 +76,25 @@
     <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
 
     <div class="form-floating">
-      <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com">
+      <!-- <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com"> -->
+      {{form.email(class_="form-control", id="floatingInput", placeholder="name@example.com")}}
       <label for="floatingInput">Email address</label>
     </div>
     <div class="form-floating">
-      <input type="password" class="form-control" id="floatingPassword" placeholder="Password">
+      <!-- <input type="password" class="form-control" id="floatingPassword" placeholder="Password"> -->
+      {{form.password(class_="form-control", id="floatingPassword", placeholder="Password")}}
       <label for="floatingPassword">Password</label>
     </div>
 
     <div class="checkbox mb-3">
       <label>
-        <input type="checkbox" value="remember-me"> Remember me
+        <!-- <input type="checkbox" value="remember-me"> -->
+        {{form.remember(checked=False)}}
+        Remember me
       </label>
     </div>
-    <button class="w-100 btn btn-lg btn-color-own" type="submit">Sign in</button>
+    {{form.login(class_="w-100 btn btn-lg btn-color-own", value="Sign in")}}
+    <!-- <button class="w-100 btn btn-lg btn-color-own" type="submit">Sign in</button> -->
     <p class="mt-5 mb-3 text-muted">&copy;Grupo Coinp {{moment().format("YYYY")}}</p>
   </form>
 </main>

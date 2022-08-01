@@ -1,0 +1,63 @@
+{% from "macros.html" import favicon %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registro</title>
+  {{favicon()}}
+  <link rel="stylesheet" href={{url_for('static', filename='registro/registro.css')}}>
+  <link rel="stylesheet" href={{url_for('static', filename='css/normalize.css')}}>
+  {{ bootstrap.load_css() }}
+  {{ moment.include_moment() }}
+</head>
+<body class="body-own">
+  {{ bootstrap.load_js() }}
+  <div class="container m-auto">
+    <div class="card" style="border-radius: 15px; box-shadow: 10px 10px 10px 5px rgba(0, 0, 0, 0.2);">
+      <div class="card-body p-5">
+        <h3 class="text-title text-center mb-5">Create an account</h3>
+        <form>
+          <div class="form-outline mb-4">
+            <input type="text" id="full_name" class="form-control form-control-lg" placeholder="Franzua Plasencia" />
+            <label class="form-label" for="full_name">Full Name</label>
+          </div>
+
+          <div class="form-outline mb-4">
+            <input type="email" id="email_" class="form-control form-control-lg" placeholder="example@mail.com" />
+            <label class="form-label" for="email_">Email</label>
+          </div>
+
+          <div class="form-outline mb-4">
+            <input type="password" id="password" class="form-control form-control-lg" />
+            <label class="form-label" for="password">Password</label>
+          </div>
+
+          <div class="form-outline mb-4">
+            <input type="password" id="password_repeat" class="form-control form-control-lg" />
+            <label class="form-label" for="password_repeat">Repeat password</label>
+          </div>
+
+          <div class="form-check d-flex justify-content-center mb-5">
+            <input class="form-check-input me-2" type="checkbox" value="" id="checkbox_agree_statements" />
+            <label class="form-check-label" for="checkbox_agree_statements">
+              I agree all statements in <a href="#!" class="text-body"><u>Terms of service</u></a>
+            </label>
+          </div>
+
+          <div class="d-flex justify-content-center">
+            <button type="button"
+              class="btn btn-success btn-block btn-lg gradient-custom-4 text-body">Register</button>
+          </div>
+
+          <p class="text-center text-muted mt-5 mb-0">Have already an account? <a href="{{url_for('login')}}"
+              class="fw-bold text-body"><u>Login here</u></a></p>
+        </form>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+
+

@@ -1,3 +1,4 @@
+{% from "macros.html" import favicon %}
 <!doctype html>
 <html lang="en">
   <head>
@@ -5,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
     <meta name="author" content="Franzua Plasencia - GitHub🤖: @plasenca">
-    <meta name="generator" content="Hugo 0.101.0">
+    {{favicon()}}
     {{ bootstrap.load_css() }}
     {{ moment.include_moment() }}
     <title>Login</title>
@@ -62,6 +63,20 @@
         white-space: nowrap;
         -webkit-overflow-scrolling: touch;
       }
+
+      .btn-registro {
+        text-decoration: none;
+        color: #163b66;
+        font-size: 1rem;
+      }
+
+      .btn-registro:hover {
+        color: #fff;
+        background-color: #163b66;
+      }
+      .checkbox-margin-top{
+        margin-top: 0.5rem;
+      }
     </style>
 
     <!-- Custom styles for this template -->
@@ -72,29 +87,33 @@
     {{ bootstrap.load_js() }}
 <main class="form-signin w-100 m-auto">
   <form>
+    {{ form.csrf_token }}
     <img class="mb-4 imagen" src="static/logo.png" alt="" width="200" height="200">
     <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
 
     <div class="form-floating">
-      <!-- <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com"> -->
       {{form.email(class_="form-control", id="floatingInput", placeholder="name@example.com")}}
       <label for="floatingInput">Email address</label>
     </div>
     <div class="form-floating">
-      <!-- <input type="password" class="form-control" id="floatingPassword" placeholder="Password"> -->
       {{form.password(class_="form-control", id="floatingPassword", placeholder="Password")}}
       <label for="floatingPassword">Password</label>
     </div>
 
-    <div class="checkbox mb-3">
-      <label>
-        <!-- <input type="checkbox" value="remember-me"> -->
-        {{form.remember(checked=False)}}
-        Remember me
-      </label>
+    <div class="container">
+      <div class="row">
+        <div class="checkbox mb-3 col checkbox-margin-top">
+          <label>
+            {{form.remember(checked=False)}}
+            Remember me
+          </label>
+        </div>
+        <div class="mb-3 center col">
+          <a class="btn btn-link btn-registro btn-outline-secondary" href="{{url_for('registro')}}">Registrarme</a>
+        </div>
+      </div>
     </div>
     {{form.login(class_="w-100 btn btn-lg btn-color-own", value="Sign in")}}
-    <!-- <button class="w-100 btn btn-lg btn-color-own" type="submit">Sign in</button> -->
     <p class="mt-5 mb-3 text-muted">&copy;Grupo Coinp {{moment().format("YYYY")}}</p>
   </form>
 </main>

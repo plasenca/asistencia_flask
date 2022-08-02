@@ -86,7 +86,7 @@
   <body class="text-center">
     {{ bootstrap.load_js() }}
 <main class="form-signin w-100 m-auto">
-  <form>
+  <form method="post" action="/login">
     {{ form.csrf_token }}
     <img class="mb-4 imagen" src="static/logo.png" alt="" width="200" height="200">
     <h1 class="h3 mb-3 fw-normal">Please sign in</h1>

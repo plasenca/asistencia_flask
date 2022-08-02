@@ -18,37 +18,59 @@
     <div class="card" style="border-radius: 15px; box-shadow: 10px 10px 10px 5px rgba(0, 0, 0, 0.2);">
       <div class="card-body p-5">
         <h3 class="text-title text-center mb-5">Create an account</h3>
-        <form>
+        <form method="post" action="/registro">
+          {{ form.csrf_token }}
           <div class="form-outline mb-4">
-            <input type="text" id="full_name" class="form-control form-control-lg" placeholder="Franzua Plasencia" />
-            <label class="form-label" for="full_name">Full Name</label>
-          </div>
+            {% for error in form.first_name.errors %}
+                {{ error|e }}
+            {% endfor %}
+            {{form.first_name(class_="form-control form-control-lg", placeholder="Kevin")}}
+            {{form.first_name.label(class_="form-label")}}
 
-          <div class="form-outline mb-4">
-            <input type="email" id="email_" class="form-control form-control-lg" placeholder="example@mail.com" />
-            <label class="form-label" for="email_">Email</label>
+            {% for error in form.last_name.errors %}
+                {{ error|e }}
+            {% endfor %}
+            {{form.last_name(class_="form-control form-control-lg", placeholder="López")}}
+            {{form.last_name.label(class_="form-label")}}
           </div>
-
           <div class="form-outline mb-4">
-            <input type="password" id="password" class="form-control form-control-lg" />
+            {{form.email(class_="form-control form-control-lg", placeholder="example@mail.com")}}
+            {{form.email.label(class_="form-label")}}
+            {% for error in form.email.errors %}
+                {{ error|e }}
+            {% endfor %}
+            
+          </div>
+          
+          <div class="form-outline mb-4">
+            {{form.password(class_="form-control form-control-lg")}}
             <label class="form-label" for="password">Password</label>
+            {{form.password.label(class_="form-label")}}
+            {% for error in form.password.errors %}
+                {{ error|e }}
+            {% endfor %}
           </div>
-
+          
           <div class="form-outline mb-4">
-            <input type="password" id="password_repeat" class="form-control form-control-lg" />
-            <label class="form-label" for="password_repeat">Repeat password</label>
+            {{form.password_confirmer(class_="form-control form-control-lg")}}
+            {{form.password_confirmer.label(class_="form-label")}}
+            {% if form.password_confirmer.errors %}
+                {% for error in form.password_confirmer.errors %}
+                    {{ error|e }}
+                {% endfor %}
+            {% endif %}
+            
           </div>
 
           <div class="form-check d-flex justify-content-center mb-5">
-            <input class="form-check-input me-2" type="checkbox" value="" id="checkbox_agree_statements" />
-            <label class="form-check-label" for="checkbox_agree_statements">
+            {{form.agree_to_terms(class_="form-check-input me-2", value="True")}}
+            <label class="form-check-label" for="agree_to_terms">
               I agree all statements in <a href="#!" class="text-body"><u>Terms of service</u></a>
             </label>
           </div>
 
           <div class="d-flex justify-content-center">
-            <button type="button"
-              class="btn btn-success btn-block btn-lg gradient-custom-4 text-body">Register</button>
+            {{form.register(class_="btn btn-config btn-block btn-lg gradient-custom-4",)}}
           </div>
 
           <p class="text-center text-muted mt-5 mb-0">Have already an account? <a href="{{url_for('login')}}"

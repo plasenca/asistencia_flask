@@ -5,7 +5,7 @@ from wtforms import (EmailField, PasswordField,
                      SubmitField, BooleanField,
                      StringField)
 from wtforms.validators import (DataRequired, Length, Email, EqualTo)
-from app import login_manager
+from app import login_manager, app
 from werkzeug.security import generate_password_hash, check_password_hash
 
 # CreatinG Users Models
@@ -95,6 +95,10 @@ class PageRegisterForm(FlaskForm):
     register = SubmitField()
 
 
+# Configurations
+
 @login_manager.user_loader
-def load_user(user_id):
-    return RegisterForms.get_by_id(int(user_id))
+def load_user(id):
+    return RegisterForms.query.get(int(id))
+
+# user_manager = UserManager(app, db, RegisterForms)

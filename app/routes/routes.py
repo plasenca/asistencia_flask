@@ -13,6 +13,9 @@ def index():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('main'))
+    
     form = LoginForm()
     if request.method == "GET":
         return render_template('login/login-after-register.html', form=form), 200
@@ -26,13 +29,16 @@ def login():
                 "remember": form.remember.data
             }
             user = RegisterForms.get_by_email(login_user_dict["email"])
+            # Si el correo no existe
             if user is None:
                 error = f"Usuario no encontrado"
                 flash(error)
             else:
                 # Si la contraseña concuerda con la ingresada
                 if user.check_password(login_user_dict["password"]):
-                    login_user(user, remember=login_user_dict["remember"])
+                    print(user.role_id)
+                    
+                    login_user(user, remember=login_user_dict["remember"], force=True)
                     return redirect(url_for("main")), 302
                 else: 
                     error = f"La contraseña ingresada es  inválida"

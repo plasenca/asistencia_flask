@@ -1,3 +1,4 @@
+from cgi import print_arguments
 from flask import (render_template, redirect, request, 
                    flash, Markup, url_for)
 from models.models import LoginForm, PageRegisterForm
@@ -18,7 +19,24 @@ def login():
 
     if request.method == "POST":
         if form.validate_on_submit():
-            return redirect(url_for("main")), 302
+            
+            login_user_dict = {
+                "email"   : form.email.data,
+                "password": form.password.data,
+                "remember": form.remember.data
+            }
+            user = RegisterForms.get_by_email(login_user_dict["email"])
+            if user is None:
+                error = f"Usuario no encontrado"
+                flash(error)
+            else:
+                # Si la contraseña concuerda con la ingresada
+                if user.check_password(login_user_dict["password"]):
+                    login_user(user, remember=login_user_dict["remember"])
+                    return redirect(url_for("main")), 302
+                else: 
+                    error = f"La contraseña ingresada es  inválida"
+                    flash(error)
     return render_template('login/login.html', form=form), 200
 
 @app.route('/register', methods=["GET", "POST"])

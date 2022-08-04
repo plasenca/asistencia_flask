@@ -92,6 +92,16 @@
     <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
 
     {% block register %}{% endblock %}
+
+    {%with messages = get_flashed_messages()%}
+      {% if messages %}
+          {% for message in messages %}
+            <div class="alert alert-danger" role="alert">
+              {{message}}
+            </div>
+          {% endfor %}
+      {% endif %}
+    {%endwith%}
     
     <div class="form-floating">
       {{form.email(class_="form-control", id="floatingInput", placeholder="name@example.com")}}

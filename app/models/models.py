@@ -10,9 +10,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 # CreatinG Users Models
 
-# Creating the RegisterForm class with db.Model
-
-
+    # Creating the RegisterForm class with db.Model
 class RegisterForms(db.Model, UserMixin):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
@@ -26,12 +24,11 @@ class RegisterForms(db.Model, UserMixin):
 
     # User Information
     active = db.Column('is_active', db.Boolean(),
-                       nullable=False, server_default='0')
+                        nullable=False, server_default='0')
     first_name = db.Column(db.Unicode(50), nullable=False, server_default=u'')
     last_name = db.Column(db.Unicode(50), nullable=False, server_default=u'')
 
     # Relationships
-    # role_id = db.Column(db.Integer(), db.ForeignKey("roles.id"))
     role_id = db.Column(db.Integer,  db.ForeignKey("roles.id"))
     
     def __repr__(self) -> str:
@@ -53,7 +50,7 @@ class RegisterForms(db.Model, UserMixin):
         return RegisterForms.query.get(_id).first()
     
     @staticmethod
-    def get_by_email(email:str) -> str:
+    def get_by_email(email:str):
         return RegisterForms.query.filter_by(email=email).first()
 
     # Creating the Role class with db.Model
@@ -62,17 +59,9 @@ class Role(db.Model):
     __tablename__ = 'roles'
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(50), nullable=False,
-                     server_default='', unique=True)  # for @roles_accepted()
+                    server_default='', unique=True)  # for @roles_accepted()
     label = db.Column(db.Unicode(255), nullable=False, server_default='')
     users = db.relationship("RegisterForms", backref=db.backref("roles"))
-    # Creating the UserRoles class with db.Model
-
-
-# class UserRoles(db.Model):
-#     __tablename__ = 'user_roles'
-#     id = db.Column(db.Integer(), primary_key=True)
-#     user_id = db.Column(db.Integer(), db.ForeignKey(
-#         'users.id', ondelete='CASCADE'))
 
 
 # Creating Forms

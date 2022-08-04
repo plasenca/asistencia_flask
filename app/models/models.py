@@ -6,6 +6,7 @@ from wtforms import (EmailField, PasswordField,
                      StringField)
 from wtforms.validators import (DataRequired, Length, Email, EqualTo)
 from app import login_manager
+from werkzeug.security import generate_password_hash, check_password_hash
 
 # CreatinG Users Models
 
@@ -30,11 +31,32 @@ class RegisterForms(db.Model, UserMixin):
     last_name = db.Column(db.Unicode(50), nullable=False, server_default=u'')
 
     # Relationships
-    roles = db.relationship('Role', secondary='user_roles',
-                            backref=db.backref('users', lazy='dynamic'))
+    # role_id = db.Column(db.Integer(), db.ForeignKey("roles.id"))
+    role_id = db.Column(db.Integer,  db.ForeignKey("roles.id"))
+    
+    def __repr__(self) -> str:
+        return f'<User {self.first_name + self.last_name}-{self.email}>'
+
+    def set_password(self, password):
+        self.password = generate_password_hash(password)
+        
+    def check_password(self, password):
+        return check_password_hash(self.password, password)
+    
+    def save(self:"RegisterForms"):
+        if not self.id:
+            db.session.add(self)
+        db.session.commit()
+
+    @staticmethod
+    def get_by_id(_id:int) -> str:
+        return RegisterForms.query.get(_id).first()
+    
+    @staticmethod
+    def get_by_email(email:str) -> str:
+        return RegisterForms.query.filter_by(email=email).first()
 
     # Creating the Role class with db.Model
-
 
 class Role(db.Model):
     __tablename__ = 'roles'
@@ -42,15 +64,15 @@ class Role(db.Model):
     name = db.Column(db.String(50), nullable=False,
                      server_default='', unique=True)  # for @roles_accepted()
     label = db.Column(db.Unicode(255), nullable=False, server_default='')
-
+    users = db.relationship("RegisterForms", backref=db.backref("roles"))
     # Creating the UserRoles class with db.Model
 
 
-class UserRoles(db.Model):
-    __tablename__ = 'user_roles'
-    id = db.Column(db.Integer(), primary_key=True)
-    user_id = db.Column(db.Integer(), db.ForeignKey(
-        'users.id', ondelete='CASCADE'))
+# class UserRoles(db.Model):
+#     __tablename__ = 'user_roles'
+#     id = db.Column(db.Integer(), primary_key=True)
+#     user_id = db.Column(db.Integer(), db.ForeignKey(
+#         'users.id', ondelete='CASCADE'))
 
 
 # Creating Forms
@@ -58,7 +80,7 @@ class UserRoles(db.Model):
     # Creating the LoginForm class with FlaskForm
 class LoginForm(FlaskForm):
     email = EmailField('Email Addres', validators=[
-                       DataRequired(), Length(1, 64), Email()])
+                        DataRequired(), Length(1, 64), Email()])
     password = PasswordField('Password', validators=[DataRequired()])
     login = SubmitField('Sign In')
     remember = BooleanField('Remember Me')
@@ -68,22 +90,22 @@ class LoginForm(FlaskForm):
 
 class PageRegisterForm(FlaskForm):
     first_name = StringField('First Name',
-                             validators=[DataRequired(message="Debe ingresar su nombre"),
-                                         Length(1, 50)])
+                              validators=[DataRequired(),
+                                        Length(1, 50)])
     last_name = StringField('Last Name',
-                            validators=[DataRequired(message="Debe ingresar su apellido"),
+                            validators=[DataRequired(),
                                         Length(1, 50)])
     email = EmailField('Email Address',
-                       validators=[DataRequired(),
-                                   Length(1, 64)])
+                        validators=[DataRequired(),
+                                    Length(1, 64)])
     password = PasswordField("Password",
-                             validators=[DataRequired(message="Introduzca una contraseña"),
-                                         EqualTo("password_confirmer", message="Las contraseñas deben coincidir")])
+                            validators=[DataRequired(),
+                                        EqualTo("password_confirmer", message="Las contraseñas deben coincidir")])
     password_confirmer = PasswordField('Repeat Password')
     agree_to_terms = BooleanField('Agree to Terms', validators=[DataRequired()])
     register = SubmitField()
 
 
 @login_manager.user_loader
-def load_user(email):
-    return LoginForm.get(email)
+def load_user(user_id):
+    return RegisterForms.get_by_id(int(user_id))

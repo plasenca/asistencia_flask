@@ -91,6 +91,8 @@
     <img class="mb-4 imagen" src="static/logo.png" alt="" width="200" height="200">
     <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
 
+    {% block register %}{% endblock %}
+    
     <div class="form-floating">
       {{form.email(class_="form-control", id="floatingInput", placeholder="name@example.com")}}
       <label for="floatingInput">Email address</label>
@@ -109,7 +111,7 @@
           </label>
         </div>
         <div class="mb-3 center col">
-          <a class="btn btn-link btn-registro btn-outline-secondary" href="{{url_for('registro')}}">Registrarme</a>
+          <a class="btn btn-link btn-registro btn-outline-secondary" href="{{url_for('registro')}}">Sign in</a>
         </div>
       </div>
     </div>

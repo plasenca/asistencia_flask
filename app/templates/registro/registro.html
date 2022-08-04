@@ -1,9 +1,9 @@
 {% from "macros.html" import favicon %}
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Registro</title>
   {{favicon()}}
@@ -18,28 +18,28 @@
     <div class="card" style="border-radius: 15px; box-shadow: 10px 10px 10px 5px rgba(0, 0, 0, 0.2);">
       <div class="card-body p-5">
         <h3 class="text-title text-center mb-5">Create an account</h3>
-        <form method="post" action="/registro">
+        <form method="post" action="/register">
           {{ form.csrf_token }}
           <div class="form-outline mb-4">
-            {% for error in form.first_name.errors %}
-                {{ error|e }}
-            {% endfor %}
-            {{form.first_name(class_="form-control form-control-lg", placeholder="Kevin")}}
+            {{form.first_name(class_="form-control form-control-lg", placeholder="Luis")}}
             {{form.first_name.label(class_="form-label")}}
-
-            {% for error in form.last_name.errors %}
-                {{ error|e }}
-            {% endfor %}
+          </div>
+          <div class="form-outline mb-4">
             {{form.last_name(class_="form-control form-control-lg", placeholder="López")}}
             {{form.last_name.label(class_="form-label")}}
           </div>
           <div class="form-outline mb-4">
+            {% with messages = get_flashed_messages()%}
+              {% if messages %}
+                {% for message in messages %}
+                  <div class="alert alert-warning" role="alert">
+                    {{message}}
+                  </div>
+                {% endfor %}  
+              {% endif %}
+            {% endwith %}
             {{form.email(class_="form-control form-control-lg", placeholder="example@mail.com")}}
-            {{form.email.label(class_="form-label")}}
-            {% for error in form.email.errors %}
-                {{ error|e }}
-            {% endfor %}
-            
+            {{form.email.label(class_="form-label")}}            
           </div>
           
           <div class="form-outline mb-4">
@@ -47,18 +47,15 @@
             <label class="form-label" for="password">Password</label>
             {{form.password.label(class_="form-label")}}
             {% for error in form.password.errors %}
-                {{ error|e }}
+              <div class="alert alert-warning" role="alert">
+                <strong>{{ error|e }}</strong>
+              </div>            
             {% endfor %}
           </div>
           
           <div class="form-outline mb-4">
             {{form.password_confirmer(class_="form-control form-control-lg")}}
             {{form.password_confirmer.label(class_="form-label")}}
-            {% if form.password_confirmer.errors %}
-                {% for error in form.password_confirmer.errors %}
-                    {{ error|e }}
-                {% endfor %}
-            {% endif %}
             
           </div>
 

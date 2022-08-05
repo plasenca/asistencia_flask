@@ -1,12 +1,19 @@
-from cgi import print_arguments
-from flask import (render_template, redirect, request, 
-                   flash, Markup, url_for)
+from app import app
+from datetime import datetime
+from flask import flash
+from flask import Markup
+from flask import url_for
+from flask import request
+from flask import redirect
+from flask import render_template
+from flask_login import login_user
+from flask_login import current_user
+from flask_login import logout_user
+from flask_login import login_required
 from models.models import LoginForm, PageRegisterForm
 from models.models import RegisterForms, Role
-from flask_login import login_user, current_user,login_required
-from datetime import datetime
-from app import app
 
+# Base URL redirect to login 
 @app.route('/')
 def index():
     return redirect("login"), 302
@@ -16,9 +23,9 @@ def login():
     if current_user.is_authenticated:
         return redirect(url_for('main'))
     
-    form = LoginForm()
-    if request.method == "GET":
-        return render_template('login/login-after-register.html', form=form), 200
+    form = LoginForm()    
+    # if request.method == "GET":
+    #     return render_template('login/login-after-register.html', form=form), 200
 
     if request.method == "POST":
         if form.validate_on_submit():
@@ -36,14 +43,12 @@ def login():
             else:
                 # Si la contraseña concuerda con la ingresada
                 if user.check_password(login_user_dict["password"]):
-                    print(user.role_id)
-                    
-                    login_user(user, remember=login_user_dict["remember"], force=True)
+                    login_user(user, remember=login_user_dict["remember"])
                     return redirect(url_for("main")), 302
                 else: 
                     error = f"La contraseña ingresada es  inválida"
                     flash(error)
-    return render_template('login/login.html', form=form), 200
+    return render_template('login/login.html', form=form, request=request), 200
 
 @app.route('/register', methods=["GET", "POST"])
 def registro():
@@ -89,3 +94,10 @@ def registro():
 @login_required
 def main():
     return render_template('main/asistencia.html'), 200
+
+
+@app.route("/logout")
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for("index")), 302

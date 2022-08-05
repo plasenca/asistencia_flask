@@ -1,12 +1,19 @@
 from app import db
-from flask_user import UserManager, UserMixin
-from flask_wtf import FlaskForm
-from wtforms import (EmailField, PasswordField,
-                     SubmitField, BooleanField,
-                     StringField)
-from wtforms.validators import (DataRequired, Length, Email, EqualTo)
 from app import login_manager, app
-from werkzeug.security import generate_password_hash, check_password_hash
+from flask_wtf import FlaskForm
+from flask_user import UserMixin
+from flask_user import UserManager
+from wtforms import EmailField
+from wtforms import SubmitField
+from wtforms import StringField
+from wtforms import BooleanField
+from wtforms import PasswordField
+from wtforms.validators import Email
+from wtforms.validators import Length
+from wtforms.validators import EqualTo
+from wtforms.validators import DataRequired
+from werkzeug.security import check_password_hash
+from werkzeug.security import generate_password_hash
 
 # CreatinG Users Models
 
@@ -101,4 +108,4 @@ class PageRegisterForm(FlaskForm):
 def load_user(id):
     return RegisterForms.query.get(int(id))
 
-# user_manager = UserManager(app, db, RegisterForms)
+user_manager = UserManager(app, db, RegisterForms)

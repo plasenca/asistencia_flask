@@ -96,9 +96,15 @@
     {%with messages = get_flashed_messages()%}
       {% if messages %}
           {% for message in messages %}
-            <div class="alert alert-danger" role="alert">
+            {% if request.method == "GET" %}
+            <div class="alert alert-primary" role="alert">
               {{message}}
             </div>
+            {% else %}
+              <div class="alert alert-danger" role="alert">
+                {{message}}
+              </div>
+            {% endif %}
           {% endfor %}
       {% endif %}
     {%endwith%}

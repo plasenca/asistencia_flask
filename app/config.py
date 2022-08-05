@@ -13,6 +13,7 @@ class DevelopmentConfig(Config):
     FLASK_APP= os.environ.get('FLASK_APP')
     SQLALCHEMY_DATABASE_URI = os.environ.get('DEV_DATABASE_URL')
     SQLALCHEMY_TRACK_MODIFICATIONS = os.environ.get('SQLALCHEMY_TRACK_MODIFICATIONS')
+    USER_ENABLE_EMAIL = False
     print('DevelopmentConfig'.center(80, '-'))
 
 

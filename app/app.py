@@ -1,10 +1,10 @@
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager
-from flask_bootstrap import Bootstrap5
+from config import config
 from flask_moment import Moment
 from flask_migrate import Migrate
-from config import config
+from flask_login import LoginManager
+from flask_bootstrap import Bootstrap5
+from flask_sqlalchemy import SQLAlchemy
 
 # App initialization
 app = Flask(__name__)

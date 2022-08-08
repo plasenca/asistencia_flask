@@ -1,3 +1,4 @@
+import glob
 import datetime
 
 from app import app
@@ -7,11 +8,14 @@ from flask import url_for
 from flask import request
 from flask import redirect
 from flask import render_template
+from constants import FILES_DIR
 from psycopg2 import DatabaseError
 from flask_login import login_user
 from flask_login import current_user
 from flask_login import logout_user
 from flask_login import login_required
+from werkzeug.utils import secure_filename
+from models.models import FileLoader
 from models.models import RegisterForms, Role
 from models.models import LoginForm, PageRegisterForm
 
@@ -90,13 +94,28 @@ def login():
                     flash(error)
     return render_template('login/login.html', form=form, request=request), 200
 
-
-
 @app.route('/main', methods=["GET"])
 @login_required
 def main():
-    
-    return render_template('main/main.html'), 200
+    form = FileLoader()
+    return render_template('main/main.html', form=form), 200
+
+@app.route('/file-added', methods=["POST"])
+@login_required
+def file_added():
+    form = FileLoader()
+    try:
+        file = form.file.data
+        filename = secure_filename(file.filename)
+        # Eliminar todos los ficheros antes de agregar otro
+        files_in_files = glob.glob(FILES_DIR/"*.*")
+        print(files_in_files)
+        file.save(FILES_DIR/filename)
+        return redirect(url_for("main")), 302
+    except:
+        not_file = "Does not exist any file to upload"
+        flash(not_file)
+        return redirect(url_for("main")), 302
 
 
 @app.route("/logout")

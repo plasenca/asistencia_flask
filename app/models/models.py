@@ -12,6 +12,7 @@ from wtforms.validators import Email
 from wtforms.validators import Length
 from wtforms.validators import EqualTo
 from wtforms.validators import DataRequired
+from flask_wtf.file import FileField, FileAllowed
 from werkzeug.security import check_password_hash
 from werkzeug.security import generate_password_hash
 
@@ -39,7 +40,7 @@ class RegisterForms(db.Model, UserMixin):
     role_id = db.Column(db.Integer,  db.ForeignKey("roles.id"))
     
     def __repr__(self) -> str:
-        return f'<User {self.first_name + self.last_name}-{self.email}>'
+        return f'<User {self.first_name} {self.last_name}>'
 
     def set_password(self, password):
         self.password = generate_password_hash(password)
@@ -101,6 +102,14 @@ class PageRegisterForm(FlaskForm):
     agree_to_terms = BooleanField('Agree to Terms', validators=[DataRequired()])
     register = SubmitField()
 
+
+    # Creating form for upload a file
+
+class FileLoader(FlaskForm):
+    file = FileField(label="Export", 
+                    validators=[FileAllowed([".csv", ".xlsx", ".dat", ".pdf"], 
+                                            message="Only data files('.csv', '.xlsx', '.dat')")] )
+    submit = SubmitField()
 
 # Configurations
 

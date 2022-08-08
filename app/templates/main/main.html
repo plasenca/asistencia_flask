@@ -19,6 +19,9 @@
           <li class="nav-item ms-5">
             <a class="nav-link" href="https://store.grupocoinp.com">Tienda</a>
           </li>
+          <li class="nav-item ms-5">
+            <a class="nav-link" href="https://store.grupocoinp.com">Tienda</a>
+          </li>
         </ul>
         
         <!-- <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3 fs-6" href="/main">Tienda</a> -->
@@ -42,7 +45,7 @@
         <div class="position-sticky pt-3 sidebar-sticky">
           <ul class="nav flex-column">
             <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="/test">
+              <a class="nav-link active" aria-current="page" href="/main">
                 <span data-feather="home" class="align-text-bottom"></span>
                 Asistencia
               </a>
@@ -124,8 +127,29 @@
       <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
         <div
           class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-          <h1 class="h2">Dashboard</h1>
+          <h1 class="h2">Dashboard - {{current_user.first_name}} {{current_user.last_name}}</h1>
+          
+          {% with messages=get_flashed_messages() %}
+            {% if messages %}
+              {% for message in messages %}
+                  <div class="alert alert-danger alert-transition">
+                    <!-- <svg class="bi flex-shrink-0 me-2" role="img" aria-label="Danger:"><use xlink:href="#exclamation-triangle-fill"/></svg> -->
+                      {{message}}
+                  </div>
+              {% endfor %}
+            {% endif %}
+          {% endwith %}
+            
           <div class="btn-toolbar mb-2 mb-md-0">
+            {% if current_user.role_id == 1 %}
+              <form method="post" action={{url_for("file_added")}} enctype="multipart/form-data">
+                  {{form.csrf_token}}
+                  <div class="btn-group me-2">
+                  {{form.file(class_="btn btn-sm btn-outline-secondary", accept=".csv,.dat,.xlsx")}}
+                  {{form.submit(class_="")}}
+                  </div>
+              </form>
+            {% endif %}
             <div class="btn-group me-2">
               <button type="button" class="btn btn-sm btn-outline-secondary">Share</button>
               <button type="button" class="btn btn-sm btn-outline-secondary">Export</button>
@@ -153,10 +177,10 @@
             <thead>
               <tr>
                 <th scope="col">#</th>
-                <th scope="col">Header</th>
-                <th scope="col">Header</th>
-                <th scope="col">Header</th>
-                <th scope="col">Header</th>
+                <th scope="col">ID Empleado</th>
+                <th scope="col">Empleado</th>
+                <th scope="col">Mes</th>
+                <th scope="col">Hora de Llegada</th>
               </tr>
             </thead>
             <tbody>
@@ -164,8 +188,8 @@
                 <td>1,001</td>
                 <td>random</td>
                 <td>data</td>
+                <td>data</td>
                 <td>placeholder</td>
-                <td>text</td>
               </tr>
             </tbody>
           </table>

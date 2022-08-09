@@ -106,9 +106,7 @@ class PageRegisterForm(FlaskForm):
     # Creating form for upload a file
 
 class FileLoader(FlaskForm):
-    file = FileField(label="Export", 
-                    validators=[FileAllowed([".csv", ".xlsx", ".dat", ".pdf"], 
-                                            message="Only data files('.csv', '.xlsx', '.dat')")] )
+    file = FileField(label="Export")
     submit = SubmitField()
 
 # Configurations

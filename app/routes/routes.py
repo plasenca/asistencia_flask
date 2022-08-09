@@ -1,4 +1,3 @@
-import glob
 import datetime
 
 from app import app
@@ -8,7 +7,7 @@ from flask import url_for
 from flask import request
 from flask import redirect
 from flask import render_template
-from constants import FILES_DIR
+from constants import BASE_DIR, FILES_DIR
 from psycopg2 import DatabaseError
 from flask_login import login_user
 from flask_login import current_user
@@ -18,6 +17,7 @@ from werkzeug.utils import secure_filename
 from models.models import FileLoader
 from models.models import RegisterForms, Role
 from models.models import LoginForm, PageRegisterForm
+from utilities.utilities import DataManager
 
 # Base URL redirect to login 
 @app.route('/')
@@ -98,24 +98,37 @@ def login():
 @login_required
 def main():
     form = FileLoader()
-    return render_template('main/main.html', form=form), 200
+    
+    file = FILES_DIR/"data_joined.xlsx"
+    file_csv = DataManager.to_format_time(file, columns=["arrive_time"], format_time = "%Y-%m-%d %H:%M:%S")
+    
+    
+    return render_template('main/main.html', form=form, file_csv=file_csv), 200
 
 @app.route('/file-added', methods=["POST"])
 @login_required
 def file_added():
     form = FileLoader()
-    try:
+    if form.validate_on_submit():
+        
         file = form.file.data
-        filename = secure_filename(file.filename)
-        # Eliminar todos los ficheros antes de agregar otro
-        files_in_files = glob.glob(FILES_DIR/"*.*")
-        print(files_in_files)
-        file.save(FILES_DIR/filename)
-        return redirect(url_for("main")), 302
-    except:
-        not_file = "Does not exist any file to upload"
-        flash(not_file)
-        return redirect(url_for("main")), 302
+        # If it does exist any file
+        if file:
+
+            # Eliminar todos los ficheros antes de agregar otro
+            files_in_files = FILES_DIR.glob("*.*")
+            list(map(lambda f: f.unlink(), files_in_files))
+            
+            # Guardar el fichero enviado
+            filename = secure_filename(file.filename)
+            file.save(FILES_DIR/filename)
+            return redirect(url_for("main")), 302
+        
+        # If it does not exist any file
+        if file is None:
+            not_file = "Does not exist any file to upload"
+            flash(not_file, category="error")
+            return redirect(url_for("main")), 302
 
 
 @app.route("/logout")

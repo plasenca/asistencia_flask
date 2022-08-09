@@ -128,20 +128,21 @@
         <div
           class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
           <h1 class="h2">Dashboard - {{current_user.first_name}} {{current_user.last_name}}</h1>
-          
-          {% with messages=get_flashed_messages() %}
-            {% if messages %}
-              {% for message in messages %}
-                  <div class="alert alert-danger alert-transition">
-                    <!-- <svg class="bi flex-shrink-0 me-2" role="img" aria-label="Danger:"><use xlink:href="#exclamation-triangle-fill"/></svg> -->
-                      {{message}}
-                  </div>
-              {% endfor %}
-            {% endif %}
-          {% endwith %}
             
           <div class="btn-toolbar mb-2 mb-md-0">
+
             {% if current_user.role_id == 1 %}
+              {% with messages=get_flashed_messages() %}
+                {% if messages %}
+                  {% for message in messages %}
+                    <div class="alert alert-danger alert-dismissible fade show alert-transparent" role="alert">
+                      <!-- <svg class="bi flex-shrink-0 me-2" role="img" aria-label="Danger:"><use xlink:href="#exclamation-triangle-fill"/></svg> -->
+                        {{message}}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                  {% endfor %}
+                {% endif %}
+              {% endwith %} 
               <form method="post" action={{url_for("file_added")}} enctype="multipart/form-data">
                   {{form.csrf_token}}
                   <div class="btn-group me-2">
@@ -184,6 +185,22 @@
               </tr>
             </thead>
             <tbody>
+              {% if current_user.role_id == 1 %}
+                  {% for i,row in file_csv.iterrows() %}
+                    <tr>
+                      <td>{{i}}</td>
+                      <td>{{row['employee_id']}}</td>
+                      <td>{{row['employee_name']}}</td>
+                      <td>{{row['arrive_time']}}</td>
+                      <td>{{row['arrive_time']}}</td>
+                    </tr>
+                    {% if i==10 %}
+                        {{break}}
+                    {% endif %}
+                    
+                  {% endfor %}
+              {% endif %}
+              
               <tr>
                 <td>1,001</td>
                 <td>random</td>

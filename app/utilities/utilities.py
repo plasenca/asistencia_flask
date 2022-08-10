@@ -5,7 +5,7 @@ from pathlib import Path
 from pandas import DataFrame
 from pandas.errors import DtypeWarning
 
-class DataManager:
+class DataConverter:
     
     @staticmethod
     def reader_excel(data: Path) -> DataFrame:
@@ -56,24 +56,25 @@ class DataManager:
         
         match format_file:
             case "csv":
-                data = DataManager.reader_csv(data)
+                data = DataConverter.reader_csv(data)
                 
             case "xlsx":
-                data = DataManager.reader_excel(data)
+                data = DataConverter.reader_excel(data)
                 
             case "dat":
-                data = DataManager.reader_data(data)
+                data = DataConverter.reader_data(data)
                 
             case _:
                 raise DtypeWarning(f"It's not an accepted format.")
 
         i = 0
         while i < len(columns):
-            data[columns[i]] = pd.to_datetime(data[columns[i]], format="%Y-%m-%d %H:%M:%S")
+            data[columns[i]] = pd.to_datetime(data[columns[i]], format=format_time)
             i+=1
 
         return data
 
+    @staticmethod
     def to_excel_file(data: DataFrame, filename="data"):
         """Function to convert a DataFrame to Excel file
         
@@ -87,5 +88,14 @@ class DataManager:
         else:
             raise DtypeWarning("It's not a DataFrame")
         
+
+class DataManagment:
+    
+    @staticmethod
+    def put_columns(data: DataFrame,*args):
+        return data.columns[args]
+
+
+
 if __name__ == "__main__":
-    DataManager.to_excel_file(data="asd",filename="Hola")
+    DataConverter.to_excel_file(data="asd",filename="Hola")

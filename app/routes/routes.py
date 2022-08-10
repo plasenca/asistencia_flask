@@ -17,7 +17,7 @@ from werkzeug.utils import secure_filename
 from models.models import FileLoader
 from models.models import RegisterForms, Role
 from models.models import LoginForm, PageRegisterForm
-from utilities.utilities import DataManager
+from utilities.utilities import DataConverter
 
 # Base URL redirect to login 
 @app.route('/')
@@ -99,9 +99,11 @@ def login():
 def main():
     form = FileLoader()
     
-    file = FILES_DIR/"data_joined.xlsx"
-    file_csv = DataManager.to_format_time(file, columns=["arrive_time"], format_time = "%Y-%m-%d %H:%M:%S")
+    files = [f for f in FILES_DIR.iterdir()]
+    file = files[0]
+    file_csv = DataConverter.to_format_time(file, columns=["arrive_time"], format_time = "%Y-%m-%d %H:%M:%S")
     
+
     
     return render_template('main/main.html', form=form, file_csv=file_csv), 200
 
@@ -146,3 +148,21 @@ def page_404(error):
 @app.errorhandler(DatabaseError)
 def page_500(error):
     return render_template("errors/500.html"), 500
+
+
+# Custom Filters
+
+    # Custom Filter to convert str to datetime format
+@app.template_filter('date')
+def date_filter(s, format):
+    return datetime.datetime.strptime(s, format)
+
+    # Custom Filter to return the month form a datetime object
+@app.template_filter('month')
+def month_filter(s):
+    return datetime.datetime.strftime(s, "%B")
+
+    # 
+@app.template_filter("strip")
+def str_strip(s:str):
+    return s.strip()

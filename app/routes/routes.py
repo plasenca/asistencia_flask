@@ -22,7 +22,6 @@ from utilities.utilities import DataConverter
 # Base URL redirect to login 
 @app.route('/')
 def index():
-    
     return redirect("login"), 302
 
 @app.route('/register', methods=["GET", "POST"])

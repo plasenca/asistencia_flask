@@ -30,7 +30,7 @@ class DataConverter:
         return pd.read_csv(data)
     
     @staticmethod
-    def reader_data(data: Path) -> DataFrame:
+    def reader_dat(data: Path) -> DataFrame:
         """
         Function to read data from .dat file.
         

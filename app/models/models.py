@@ -13,13 +13,13 @@ from wtforms.validators import Email
 from wtforms.validators import Length
 from wtforms.validators import EqualTo
 from wtforms.validators import DataRequired
-from flask_wtf.file import FileField, FileAllowed
+from flask_wtf.file import FileField
 from werkzeug.security import check_password_hash
 from werkzeug.security import generate_password_hash
 
-# CreatinG Users Models
+# Create Users Models
 
-    # Creating the RegisterForm class with db.Model
+    # Create the RegisterForm class with db.Model
 class RegisterForms(db.Model, UserMixin):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
@@ -63,7 +63,7 @@ class RegisterForms(db.Model, UserMixin):
     def get_by_email(email:str):
         return RegisterForms.query.filter_by(email=email).first()
 
-    # Creating the Role class with db.Model
+    # Create the Role class with db.Model
 
 class Role(db.Model):
     __tablename__ = 'roles'
@@ -73,8 +73,7 @@ class Role(db.Model):
     label = db.Column(db.Unicode(255), nullable=False, server_default='')
     users = db.relationship("RegisterForms", backref=db.backref("roles"))
 
-
-    # Creating the Location class with db.Model
+    # Create the Location class with db.Model
 
 class Location(db.Model):
     __tablename__ = "locations"
@@ -84,10 +83,19 @@ class Location(db.Model):
                     server_default='',unique=True)
     users = db.relationship("RegisterForms", backref=db.backref("location"))
     
-    
-# Creating Forms
+    # Create the Employee class with db.Model
 
-    # Creating the LoginForm class with FlaskForm
+class Employee(db.Model):
+    __tablename__ = "employee"
+    
+    id = db.Column(db.Integer, primary_key=True)
+    first_name = db.Column(db.String(50), nullable=False)
+    last_name = db.Column(db.String(50), nullable=False)
+    assistance_id = db.Column(db.Integer, nullable=False)
+
+# Create Forms
+
+    # Create the LoginForm class with FlaskForm
 class LoginForm(FlaskForm):
     email = EmailField('Email Addres', validators=[
                         DataRequired(), Length(1, 64), Email()])
@@ -95,8 +103,7 @@ class LoginForm(FlaskForm):
     login = SubmitField('Sign In')
     remember = BooleanField('Remember Me')
 
-    # Creating the RegisterForm class with FlaskForm
-
+    # Create the PageRegisterForm class with FlaskForm
 
 class PageRegisterForm(FlaskForm):
     first_name = StringField('First Name',
@@ -118,8 +125,7 @@ class PageRegisterForm(FlaskForm):
                                             (3, "Tienda Ferretero")])
     register = SubmitField()
 
-
-    # Creating form for upload a file
+    # Create form for upload a file
 
 class FileLoader(FlaskForm):
     file = FileField(label="Export")

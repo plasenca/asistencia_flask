@@ -38,7 +38,7 @@ class RegisterForms(db.Model, UserMixin):
     last_name = db.Column(db.Unicode(50), nullable=False, server_default=u'')
 
     # Relationships
-    work_site = db.Column(db.Integer, db.ForeignKey("locations.id"))
+    work_id = db.Column(db.Integer, db.ForeignKey("locations.id"))
     role_id = db.Column(db.Integer,  db.ForeignKey("roles.id"))
     
     def __repr__(self) -> str:
@@ -77,12 +77,12 @@ class Role(db.Model):
     # Creating the Location class with db.Model
 
 class Location(db.Model):
-    __tablename__ = "location"
+    __tablename__ = "locations"
     
     id    = db.Column(db.Integer, primary_key=True)
     place = db.Column(db.String(50), nullable=False,
                     server_default='',unique=True)
-    users = db.relationship("RegisterForms", backref=db.backref("roles"))
+    users = db.relationship("RegisterForms", backref=db.backref("location"))
     
     
 # Creating Forms
@@ -113,9 +113,9 @@ class PageRegisterForm(FlaskForm):
                                         EqualTo("password_confirmer", message="Las contraseñas deben coincidir")])
     password_confirmer = PasswordField('Repeat Password')
     agree_to_terms = BooleanField('Agree to Terms', validators=[DataRequired()])
-    work_site = SelectField("Tienda", choices=[("Oficina Principal", "Oficina Principal"),
-                                               ("Tienda Nicollini", "Tienda Nicollini"),
-                                               ("Tienda Ferretero", "Tienda Ferretero")])
+    work_id = SelectField("Tienda", choices=[(1, "Oficina Principal"),
+                                            (2, "Tienda Nicollini"),
+                                            (3, "Tienda Ferretero")])
     register = SubmitField()
 
 

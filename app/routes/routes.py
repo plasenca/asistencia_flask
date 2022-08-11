@@ -39,7 +39,7 @@ def registro():
                 "is_active": True,
                 "first_name": form.first_name.data,
                 "last_name": form.last_name.data,
-                "work_site": form.work_site.data,
+                "work_id": form.work_id.data,
                 "role_id": 2
             }
             
@@ -55,7 +55,7 @@ def registro():
                                     active=register_user["is_active"],
                                     first_name=register_user["first_name"],
                                     last_name=register_user["last_name"],
-                                    work_site=register_user["work_site"],
+                                    work_id=register_user["work_id"],
                                     role_id=register_user["role_id"])
                 user.set_password(register_user["password"])
                 user.save()

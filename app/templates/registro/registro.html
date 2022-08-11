@@ -29,13 +29,17 @@
             {{form.last_name.label(class_="form-label")}}
           </div>
           <div class="form-outline mb-4">
+            {{form.work_site(class_="form-control form-control-lg", placeholder="López")}}
+            {{form.work_site.label(class_="form-label")}}
+          </div>
+          <div class="form-outline mb-4">
             {% with messages = get_flashed_messages()%}
               {% if messages %}
                 {% for message in messages %}
                   <div class="alert alert-warning" role="alert">
                     {{message}}
                   </div>
-                {% endfor %}  
+                {% endfor %}
               {% endif %}
             {% endwith %}
             {{form.email(class_="form-control form-control-lg", placeholder="example@mail.com")}}
@@ -70,7 +74,7 @@
             {{form.register(class_="btn btn-config btn-block btn-lg gradient-custom-4",)}}
           </div>
 
-          <p class="text-center text-muted mt-5 mb-0">Have already an account? <a href="{{url_for('login')}}"
+          <p class="text-center text-muted mt-5 mb-0">Have already an account?<a href="{{url_for('login')}}"
               class="fw-bold text-body"><u>Login here</u></a></p>
         </form>
       </div>

@@ -91,11 +91,29 @@ class DataConverter:
 
 class DataManagment:
     
+    dat_file = None
+    
     @staticmethod
     def put_columns(data: DataFrame,*args):
-        return data.columns[args]
+        """Function to add name columns to Dataframe
+        
+        Keyword arguments:
+        data  -- DataFrame object
+        *args -- Name columns tuple
+        Return: None
+        """
+        
+        data.columns = args
+
+    @staticmethod
+    def join_data():
+        pass
+    
+    
+    # def __call__(self, *args: Any, **kwds: Any) -> Any:
+    #     pass
 
 
 
 if __name__ == "__main__":
-    DataConverter.to_excel_file(data="asd",filename="Hola")
+    DataConverter("Hola.py")

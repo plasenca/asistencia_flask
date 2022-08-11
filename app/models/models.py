@@ -6,6 +6,7 @@ from flask_user import UserManager
 from wtforms import EmailField
 from wtforms import SubmitField
 from wtforms import StringField
+from wtforms import SelectField
 from wtforms import BooleanField
 from wtforms import PasswordField
 from wtforms.validators import Email
@@ -37,6 +38,7 @@ class RegisterForms(db.Model, UserMixin):
     last_name = db.Column(db.Unicode(50), nullable=False, server_default=u'')
 
     # Relationships
+    work_site = db.Column(db.Integer, db.ForeignKey("locations.id"))
     role_id = db.Column(db.Integer,  db.ForeignKey("roles.id"))
     
     def __repr__(self) -> str:
@@ -72,6 +74,17 @@ class Role(db.Model):
     users = db.relationship("RegisterForms", backref=db.backref("roles"))
 
 
+    # Creating the Location class with db.Model
+
+class Location(db.Model):
+    __tablename__ = "location"
+    
+    id    = db.Column(db.Integer, primary_key=True)
+    place = db.Column(db.String(50), nullable=False,
+                    server_default='',unique=True)
+    users = db.relationship("RegisterForms", backref=db.backref("roles"))
+    
+    
 # Creating Forms
 
     # Creating the LoginForm class with FlaskForm
@@ -100,6 +113,9 @@ class PageRegisterForm(FlaskForm):
                                         EqualTo("password_confirmer", message="Las contraseñas deben coincidir")])
     password_confirmer = PasswordField('Repeat Password')
     agree_to_terms = BooleanField('Agree to Terms', validators=[DataRequired()])
+    work_site = SelectField("Tienda", choices=[("Oficina Principal", "Oficina Principal"),
+                                               ("Tienda Nicollini", "Tienda Nicollini"),
+                                               ("Tienda Ferretero", "Tienda Ferretero")])
     register = SubmitField()
 
 

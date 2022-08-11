@@ -81,7 +81,8 @@ class Location(db.Model):
     id    = db.Column(db.Integer, primary_key=True)
     place = db.Column(db.String(50), nullable=False,
                     server_default='',unique=True)
-    users = db.relationship("RegisterForms", backref=db.backref("location"))
+    users = db.relationship("RegisterForms", 
+                            backref=db.backref("location"))
     
     # Create the Employee class with db.Model
 
@@ -92,6 +93,7 @@ class Employee(db.Model):
     first_name = db.Column(db.String(50), nullable=False)
     last_name = db.Column(db.String(50), nullable=False)
     assistance_id = db.Column(db.Integer, nullable=False)
+
 
 # Create Forms
 

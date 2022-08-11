@@ -94,7 +94,7 @@ class DataManagment:
     dat_file = None
     
     @staticmethod
-    def put_columns(data: DataFrame,*args):
+    def put_columns(data: DataFrame,_columns: list):
         """Function to add name columns to Dataframe
         
         Keyword arguments:
@@ -103,7 +103,7 @@ class DataManagment:
         Return: None
         """
         
-        data.columns = args
+        data.columns = _columns
 
     @staticmethod
     def join_data():

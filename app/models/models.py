@@ -129,15 +129,17 @@ class PageRegisterForm(FlaskForm):
                                         EqualTo("password_confirmer", message="Las contraseñas deben coincidir")])
     password_confirmer = PasswordField('Repeat Password')
     agree_to_terms = BooleanField('Agree to Terms', validators=[DataRequired()])
-    work_id = SelectField("Tienda", choices=[(1, "Oficina Principal"),
-                                            (2, "Tienda Nicollini"),
-                                            (3, "Tienda Ferretero")])
+    work_id = SelectField("Tienda", choices=[(2, "Oficina Principal"),
+                                            (3, "Tienda Nicollini"),
+                                            (4, "Tienda Ferretero")])
     register = SubmitField()
 
     # Create form for upload a file
 
 class FileLoader(FlaskForm):
-    file = FileField(label="Export")
+    file_oficina_principal = FileField(label="Oficina Principal")
+    file_nicollini = FileField(label="Tienda Nicollini")
+    file_ferretero = FileField(label="Tienda Ferretero")
     submit = SubmitField()
 
 # Configurations

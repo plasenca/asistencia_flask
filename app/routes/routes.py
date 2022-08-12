@@ -39,7 +39,6 @@ def registro():
                 "first_name": form.first_name.data,
                 "last_name": form.last_name.data,
                 "work_id": form.work_id.data,
-                "employee_id": 0,
                 "role_id": 2
             }
             
@@ -56,7 +55,6 @@ def registro():
                                     first_name=register_user["first_name"],
                                     last_name=register_user["last_name"],
                                     work_id=register_user["work_id"],
-                                    employee_id=register_user["employee_id"],
                                     role_id=register_user["role_id"])
                 user.set_password(register_user["password"])
                 user.save()
@@ -102,11 +100,11 @@ def login():
 def main():
     form = FileLoader()
     
-    files = [f for f in FILES_DIR.iterdir()]
-    file = files[0]
-    file_csv = DataConverter.to_format_time(file, columns=["arrive_time"], format_time = "%Y-%m-%d %H:%M:%S")
+    # files = [f for f in FILES_DIR.iterdir()]
+    # file = files[0]
+    # file_csv = DataConverter.to_format_time(file, columns=["arrive_time"], format_time = "%Y-%m-%d %H:%M:%S")
 
-    return render_template('main/main.html', form=form, file_csv=file_csv), 200
+    return render_template('main/main.html', form=form), 200
 
 @app.route('/file-added', methods=["POST"])
 @login_required

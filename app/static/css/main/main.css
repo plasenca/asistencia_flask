@@ -56,3 +56,21 @@
     background-color: rgba(248, 215, 218, .7);
     top: 110px;
 }
+
+
+.img-modal{
+    padding: .5rem;
+    border-radius: 60%;
+    filter: contrast(180%);
+    filter: drop-shadow(8px 8px 10px #ccc);
+}
+
+.texto-img{
+    display: block;
+    position: absolute;
+}
+
+.texto-img:hover{
+    display: block;
+    background-color: rgba(0, 0, 0, 0.70);
+}

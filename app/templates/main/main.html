@@ -131,25 +131,80 @@
             
           <div class="btn-toolbar mb-2 mb-md-0">
 
-            {% if current_user.role_id == 1 %}
-              {% with messages=get_flashed_messages() %}
-                {% if messages %}
-                  {% for message in messages %}
-                    <div class="alert alert-danger alert-dismissible fade show alert-transparent" role="alert">
-                        {{message}}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <div class="btn-group me-2">
+              {% if current_user.role_id == 1 %}
+              <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#fileImport">
+                Import</button>
+
+              <div class="modal fade" id="fileImport" tabindex="-1" aria-labelledby="fileModal" aria-hidden="true">
+                <div class="modal-dialog modal-xl">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="fileModal">Import Files</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                  {% endfor %}
-                {% endif %}
-              {% endwith %} 
-              <form method="post" action={{url_for("file_added")}} enctype="multipart/form-data">
-                  {{form.csrf_token}}
-                  <div class="btn-group me-2">
-                  {{form.file(class_="btn btn-sm btn-outline-secondary", accept=".csv,.dat,.xlsx")}}
-                  {{form.submit(class_="")}}
+                    <div class="modal-body">
+                      <div class="d-flex flex-row">
+                        <div class="p-4">
+                          <form method="post" action={{url_for("file_added")}} enctype="multipart/form-data">
+                            {{form.csrf_token}}
+                            <div class="d-flex flex-column ">
+                              <div class="text-center mb-4">
+                                <img src={{url_for('static', filename='imgs/stores/oficina_principal.jpg')}} alt="Oficina Principal" class="img-modal">
+                              </div>
+                              <div>
+                                {{form.file_oficina_principal(class_="btn btn-sm btn-outline-secondary", accept=".csv,.dat,.xlsx")}}
+                              </div>
+                              <div>
+                                {{form.submit(class_="")}}
+                              </div>
+                            </div>
+                          </form>
+                        </div>
+                        <div class="p-4 mb-2">
+                          <form method="post" action={{url_for("file_added")}} enctype="multipart/form-data">
+                            {{form.csrf_token}}
+                            <div class="d-flex flex-column">
+                              <div class="text-center mb-4" style="position:relative;">
+                                <img src={{url_for('static', filename='imgs/stores/nicollini.jpg')}} alt="Oficina Principal" class="img-modal">
+                                <div class="texto-img">Nicollini</div>
+                              </div>
+                              <div>
+                                {{form.file_nicollini(class_="btn btn-sm btn-outline-secondary", accept=".csv,.dat,.xlsx")}}
+                              </div>
+                              <div>
+                                {{form.submit(class_="")}}
+                              </div>
+                            </div>
+                          </form>
+                        </div>
+                        <div class="p-4 mb-2">
+                          <form method="post" action={{url_for("file_added")}} enctype="multipart/form-data">
+                            {{form.csrf_token}}
+                            <div class="d-flex flex-column">
+                              <div class="text-center mb-4">
+                                <img src={{url_for('static', filename='imgs/stores/ferretero.jpg')}} alt="Oficina Principal" class="img-modal">
+                              </div>
+                              <div>
+                                {{form.file_ferretero(class_="btn btn-sm btn-outline-secondary", accept=".csv,.dat,.xlsx")}}
+                              </div>
+                              <div>
+                                {{form.submit(class_="")}}
+                              </div>
+                            </div>
+                          </form>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                      <button type="button" class="btn btn-sm btn-secondary">Save changes</button>
+                    </div>
                   </div>
-              </form>
-            {% endif %}
+                </div>
+              </div>
+              {% endif %}
+            </div>
             <div class="btn-group me-2">
               <button type="button" class="btn btn-sm btn-outline-secondary">Share</button>
               <button type="button" class="btn btn-sm btn-outline-secondary">Export</button>
@@ -184,37 +239,7 @@
               </tr>
             </thead>
             <tbody>
-              {% if current_user.role_id == 1 %}
-                  {% for i,row in file_csv.iterrows() %}
-                    <tr>
-                      <td {% if row['arrive_time'] >= '2022-07-01 00:00:00'|date("%Y-%m-%d %H:%M:%S") %}
-                        class="table-danger"
-                        {% endif %}>
-                        {{i}}
-                      </td>
-                      <td {% if row['arrive_time'] >= '2022-07-01 00:00:00'|date("%Y-%m-%d %H:%M:%S") %}
-                        class="table-danger"
-                        {% endif %}>
-                        {{row['employee_id']}}
-                      </td>
-                      <td {% if row['arrive_time'] >= '2022-07-01 00:00:00'|date("%Y-%m-%d %H:%M:%S") %}
-                        class="table-danger"
-                        {% endif %}>
-                        {{row['employee_name']}}
-                      </td>
-                      <td {% if row['arrive_time'] >= '2022-07-01 00:00:00'|date("%Y-%m-%d %H:%M:%S") %}
-                          class="table-danger"
-                          {% endif %}>
-                        {{row['arrive_time']|string}}
-                      </td>
-                      <td {% if row['arrive_time'] >= '2022-07-01 00:00:00'|date("%Y-%m-%d %H:%M:%S") %}
-                        class="table-danger"
-                        {% endif %}>
-                        {{row['arrive_time']}}
-                      </td>
-                    </tr>
-                  {% endfor %}
-              {% endif %}
+
             </tbody>
           </table>
         </div>

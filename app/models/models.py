@@ -69,7 +69,7 @@ class Role(db.Model):
     __tablename__ = 'roles'
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(50), nullable=False,
-                    server_default='', unique=True)  # for @roles_accepted()
+                    server_default='', unique=True)
     label = db.Column(db.Unicode(255), nullable=False, server_default='')
     users = db.relationship("RegisterForms", backref=db.backref("roles"))
 
@@ -83,16 +83,23 @@ class Location(db.Model):
                     server_default='',unique=True)
     users = db.relationship("RegisterForms", 
                             backref=db.backref("location"))
+    locations = db.relationship("Employee", 
+                            backref=db.backref("location"))
     
     # Create the Employee class with db.Model
 
 class Employee(db.Model):
+    """
+    assistance_id = 0 => Non Defined
+    """
     __tablename__ = "employee"
     
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String(50), nullable=False)
     last_name = db.Column(db.String(50), nullable=False)
-    assistance_id = db.Column(db.Integer, nullable=False)
+    
+    # Relationship Fields
+    location_id = db.Column(db.Integer, db.ForeignKey("locations.id"))
 
 
 # Create Forms

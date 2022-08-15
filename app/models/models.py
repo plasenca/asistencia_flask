@@ -38,8 +38,8 @@ class RegisterForms(db.Model, UserMixin):
     last_name = db.Column(db.Unicode(50), nullable=False, server_default=u'')
 
     # Relationships
-    work_id = db.Column(db.Integer, db.ForeignKey("locations.id"))
-    role_id = db.Column(db.Integer,  db.ForeignKey("roles.id"))
+    work_id = db.Column(db.Integer(), db.ForeignKey("locations.id"))
+    role_id = db.Column(db.Integer(),  db.ForeignKey("roles.id"))
     
     def __repr__(self) -> str:
         return f'<User {self.first_name} {self.last_name}>'
@@ -78,7 +78,7 @@ class Role(db.Model):
 class Location(db.Model):
     __tablename__ = "locations"
     
-    id    = db.Column(db.Integer, primary_key=True)
+    id    = db.Column(db.Integer(), primary_key=True)
     place = db.Column(db.String(50), nullable=False,
                     server_default='',unique=True)
     users = db.relationship("RegisterForms", 
@@ -94,12 +94,27 @@ class Employee(db.Model):
     """
     __tablename__ = "employee"
     
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer(), primary_key=True)
     first_name = db.Column(db.String(50), nullable=False)
     last_name = db.Column(db.String(50), nullable=False)
     
     # Relationship Fields
     location_id = db.Column(db.Integer, db.ForeignKey("locations.id"))
+    
+
+class Assistance(db.Model):
+    """
+    Table to store the assistance
+    """
+    
+    __tablename__ = "assistance"
+    
+    id = db.Column(db.Integer(), primary_key=True)
+    
+    employee_id = db.Column(db.Integer(), nullable=False)
+    employee_name = db.Column(db.String(), nullable=False)
+    month = db.Column(db.String(), nullable=False)
+    time_arrive = db.Column(db.DateTime(), nullable=False)
 
 
 # Create Forms

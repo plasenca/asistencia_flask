@@ -60,17 +60,30 @@
 
 .img-modal{
     padding: .5rem;
-    border-radius: 60%;
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+    border-radius: 50%;
     filter: contrast(180%);
     filter: drop-shadow(8px 8px 10px #ccc);
 }
 
 .texto-img{
-    display: block;
+    display: inline;
     position: absolute;
+    padding-top: 8rem;
+    /* display: inline-block; */
+    height: 100%;
+    width: 100%;
+    border-radius: 60%;
+    color:rgba(0, 0, 0, 0);
+    left: 0;
+    transition: all 1s;
 }
 
 .texto-img:hover{
-    display: block;
-    background-color: rgba(0, 0, 0, 0.70);
+    /* display: block; */
+    background-color: rgba(0, 0, 0, .8);
+    font-size: 2rem;
+    color:#fff;
 }

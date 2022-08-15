@@ -130,9 +130,21 @@
           <h1 class="h2">Dashboard - {{current_user.first_name}} {{current_user.last_name}}</h1>
             
           <div class="btn-toolbar mb-2 mb-md-0">
-
+            {% if current_user.role_id == 1 %}
+              {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                  {% for message in messages %}
+                    <div class="alert alert-danger alert-transparent" role="alert">
+                      {{message}}
+                    </div>
+                  {% endfor %}
+                {% endif %}
+              {% endwith %}
+            {% endif %}
+            
             <div class="btn-group me-2">
               {% if current_user.role_id == 1 %}
+
               <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#fileImport">
                 Import</button>
 
@@ -143,63 +155,51 @@
                       <h5 class="modal-title" id="fileModal">Import Files</h5>
                       <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <div class="modal-body">
-                      <div class="d-flex flex-row">
-                        <div class="p-4">
-                          <form method="post" action={{url_for("file_added")}} enctype="multipart/form-data">
-                            {{form.csrf_token}}
+                    <form action="{{url_for("file_added")}}" method="post" enctype="multipart/form-data">
+                      <div class="modal-body">
+                        {{form.csrf_token}}
+                        <div class="d-flex flex-row">
+                          <div class="p-4">
                             <div class="d-flex flex-column ">
-                              <div class="text-center mb-4">
+                              <div class="text-center mb-4" style="position:relative;">
                                 <img src={{url_for('static', filename='imgs/stores/oficina_principal.jpg')}} alt="Oficina Principal" class="img-modal">
+                                <div class="texto-img">Oficina Principal</div>
                               </div>
                               <div>
                                 {{form.file_oficina_principal(class_="btn btn-sm btn-outline-secondary", accept=".csv,.dat,.xlsx")}}
                               </div>
-                              <div>
-                                {{form.submit(class_="")}}
-                              </div>
                             </div>
-                          </form>
-                        </div>
-                        <div class="p-4 mb-2">
-                          <form method="post" action={{url_for("file_added")}} enctype="multipart/form-data">
-                            {{form.csrf_token}}
+                          </div>
+                          <div class="p-4 mb-2">
                             <div class="d-flex flex-column">
                               <div class="text-center mb-4" style="position:relative;">
                                 <img src={{url_for('static', filename='imgs/stores/nicollini.jpg')}} alt="Oficina Principal" class="img-modal">
-                                <div class="texto-img">Nicollini</div>
+                                <div class="texto-img">Tienda Nicollini</div>
                               </div>
                               <div>
                                 {{form.file_nicollini(class_="btn btn-sm btn-outline-secondary", accept=".csv,.dat,.xlsx")}}
                               </div>
-                              <div>
-                                {{form.submit(class_="")}}
-                              </div>
                             </div>
-                          </form>
-                        </div>
-                        <div class="p-4 mb-2">
-                          <form method="post" action={{url_for("file_added")}} enctype="multipart/form-data">
-                            {{form.csrf_token}}
+                          </div>
+                          <div class="p-4 mb-2">
                             <div class="d-flex flex-column">
-                              <div class="text-center mb-4">
+                              <div class="text-center mb-4" style="position:relative;">
                                 <img src={{url_for('static', filename='imgs/stores/ferretero.jpg')}} alt="Oficina Principal" class="img-modal">
+                                <div class="texto-img">Tienda Ferretero</div>
                               </div>
                               <div>
                                 {{form.file_ferretero(class_="btn btn-sm btn-outline-secondary", accept=".csv,.dat,.xlsx")}}
                               </div>
-                              <div>
-                                {{form.submit(class_="")}}
-                              </div>
                             </div>
-                          </form>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                    <div class="modal-footer">
-                      <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Close</button>
-                      <button type="button" class="btn btn-sm btn-secondary">Save changes</button>
-                    </div>
+                      <div class="modal-footer">
+                        <div style="text-align:center;">
+                          {{form.submit(class_="btn btn-sm btn-outline-secondary", style="width:15rem;")}}
+                        </div>
+                      </div>
+                    </form>
                   </div>
                 </div>
               </div>

@@ -19,6 +19,7 @@ from models.models import RegisterForms, Role
 from models.models import LoginForm, PageRegisterForm
 from utilities.utilities import DataConverter
 
+
 # Base URL redirect to login 
 @app.route('/')
 def index():
@@ -112,23 +113,45 @@ def file_added():
     form = FileLoader()
     if form.validate_on_submit():
         
-        file = form.file.data
+        file_oficina_principal = form.file_oficina_principal.data
+        file_nicollini = form.file_nicollini.data
+        file_ferretero = form.file_ferretero.data
+        
+        # Files List
+        dicc_files = {
+            "oficina_principal": file_oficina_principal,
+            "nicollini":file_nicollini,
+            "ferretero": file_ferretero
+        }
+        
+        # Conditionals
+        files = file_oficina_principal and file_ferretero and file_nicollini
+        
         # If it does exist any file
-        if file:
-
-            # Eliminar todos los ficheros antes de agregar otro
+        if files:
+            # Delete all files before adding another one
             files_in_files = FILES_DIR.glob("*.*")
             list(map(lambda f: f.unlink(), files_in_files))
             
-            # Guardar el fichero enviado
-            filename = secure_filename(file.filename)
-            file.save(FILES_DIR/filename)
-            return redirect(url_for("main")), 302
-        
+            # Store the file
+            for name, file in dicc_files.items():
+                if file:
+                    format_file = str(file).split(".")[-1]
+                    if format_file == "dat":
+                        # filename = secure_filename(data.filename)
+                        filename = f"{name}.dat"
+                        file.save(FILES_DIR/filename)
+                        return redirect(url_for("main")), 302
+                    else:
+                        flash("Must be a .dat file")
+                        return redirect(url_for("main")), 302
+                else:
+                    print(f"{name} es {file}")
+
         # If it does not exist any file
-        if file is None:
-            not_file = "Does not exist any file to upload"
-            flash(not_file, category="error")
+        if files is None:
+            error = "Missing a file to upload"
+            flash(error, category="error")
             return redirect(url_for("main")), 302
 
 

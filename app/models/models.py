@@ -113,6 +113,7 @@ class Assistance(db.Model):
     
     employee_id = db.Column(db.Integer(), nullable=False)
     employee_name = db.Column(db.String(), nullable=False)
+    place = db.Column(db.String(), nullable=False)
     month = db.Column(db.String(), nullable=False)
     time_arrive = db.Column(db.DateTime(), nullable=False)
 

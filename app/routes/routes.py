@@ -1,5 +1,5 @@
-from crypt import methods
 import datetime
+import pandas as pd
 
 from app import app
 from flask import flash
@@ -10,6 +10,8 @@ from flask import redirect
 from flask import render_template
 from constants import BASE_DIR, FILES_DIR
 from psycopg2 import DatabaseError
+from utilities import DataConverter
+from utilities import DataManagment
 from flask_login import login_user
 from flask_login import current_user
 from flask_login import logout_user
@@ -18,7 +20,6 @@ from werkzeug.utils import secure_filename
 from models.models import FileLoader
 from models.models import RegisterForms, Role
 from models.models import LoginForm, PageRegisterForm
-from utilities.utilities import DataConverter
 
 
 # Base URL redirect to login 
@@ -111,7 +112,10 @@ def main():
 @app.route('/file-added', methods=["POST"])
 @login_required
 def file_added():
+    
     form = FileLoader()
+    data_manager = DataManagment()
+    
     if form.validate_on_submit():
         
         file_oficina_principal = form.file_oficina_principal.data
@@ -131,24 +135,29 @@ def file_added():
         # If it does exist any file
         if files:
             # Delete all files before adding another one
-            files_in_filesdir = FILES_DIR.glob("*.*")
-            list(map(lambda f: f.unlink(), files_in_filesdir))
+            deleted_files = data_manager._delete_files(FILES_DIR)
             
-            # Store the file
-            for name, file in dicc_files.items():
-                if file:
-                    format_file = str(file).split(".")[-1]
-                    # If format file is ".dat"
-                    if format_file == "dat":
-                        # filename = secure_filename(data.filename)
-                        filename = f"{name}.dat"
-                        file.save(FILES_DIR/filename)
-                        return redirect(url_for("dat_converter")), 302
+            # If it cannot delete files
+            if deleted_files:
+                # Store the file
+                for name, file in dicc_files.items():
+                    if file:
+                        format_file = str(file).split(".")[-1]
+                        # If format file is ".dat"
+                        if format_file == "dat":
+                            # filename = secure_filename(data.filename)
+                            filename = f"{name}.dat"
+                            file.save(FILES_DIR/filename)
+                            return redirect(url_for("dat_converter")), 302
+                        else:
+                            flash("Must be .dat files")
+                            return redirect(url_for("main")), 302
                     else:
-                        flash("Must be a .dat file")
-                        return redirect(url_for("main")), 302
-                else:
-                    print(f"{name} es {file}")
+                        print(f"{name} es {file}")
+            else:
+                flash("""Hubo un error en la subida de archivos. Intente de nuevo por favor\n
+                        Si el error persiste, contactar con soporte.""")
+                raise BaseException(f"No se ha podido eliminar los elementos de la ruta {FILES_DIR}")
 
         # If it does not exist any file
         if files is None:
@@ -159,7 +168,24 @@ def file_added():
 
 @app.route("/dat-converter", methods=["POST"])
 def dat_converter():
-    pass
+    
+    datfiles_list = list(FILES_DIR.glob("*.dat"))
+    length_datfiles_list = datfiles_list.__len__()
+    
+    # Dataframes 
+    df = None
+    df_datfiles_list = list(map(DataManagment._reader_dat, datfiles_list))
+    
+    
+    if length_datfiles_list > 1:
+        for i in range(length_datfiles_list - 1):
+            if df is None:
+                df = pd.concat([df_datfiles_list[i], df_datfiles_list[i+1]], ignore_index=True)
+            else:
+                df = pd.concat([df, df_datfiles_list[i+1]], ignore_index=True)
+    else:
+        df = df_datfiles_list[-1]
+    
 
 @app.route("/logout")
 @login_required

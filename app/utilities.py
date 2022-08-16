@@ -8,7 +8,7 @@ from pandas.errors import DtypeWarning
 class DataConverter:
     
     @staticmethod
-    def reader_excel(data: Path) -> DataFrame:
+    def _reader_excel(data: Path) -> DataFrame:
         """Function to read a excel file
         
         Keyword arguments:
@@ -19,7 +19,7 @@ class DataConverter:
         return pd.read_excel(data)
     
     @staticmethod
-    def reader_csv(data: Path) -> DataFrame:
+    def _reader_csv(data: Path) -> DataFrame:
         """Function to read a .csv file
         
         Keyword arguments:
@@ -30,7 +30,7 @@ class DataConverter:
         return pd.read_csv(data)
     
     @staticmethod
-    def reader_dat(data: Path) -> DataFrame:
+    def _reader_dat(data: Path) -> DataFrame:
         """
         Function to read data from .dat file.
         
@@ -42,7 +42,7 @@ class DataConverter:
         return pd.read_csv(data, sep='\t', header=None)
     
     @staticmethod
-    def to_format_time(data: Path, columns: list[str], format_time: str) -> None | DataFrame:
+    def _to_format_time(data: Path, columns: list[str], format_time: str) -> None | DataFrame:
         """Function to format datetime to a specific format
         
         Keyword arguments:
@@ -56,13 +56,13 @@ class DataConverter:
         
         match format_file:
             case "csv":
-                data = DataConverter.reader_csv(data)
+                data = DataConverter._reader_csv(data)
                 
             case "xlsx":
-                data = DataConverter.reader_excel(data)
+                data = DataConverter._reader_excel(data)
                 
             case "dat":
-                data = DataConverter.reader_data(data)
+                data = DataConverter._reader_data(data)
                 
             case _:
                 raise DtypeWarning(f"It's not an accepted format.")
@@ -75,7 +75,7 @@ class DataConverter:
         return data
 
     @staticmethod
-    def to_excel_file(data: DataFrame, filename="data"):
+    def _to_excel_file(data: DataFrame, filename="data"):
         """Function to convert a DataFrame to Excel file
         
         Keyword arguments:
@@ -92,6 +92,21 @@ class DataConverter:
 class DataManagment:
     
     dat_file = None
+    
+    @staticmethod
+    def _delete_files(path: Path):
+        """Function to delete files from a directory
+        path -- Path to delete elements
+        """
+        try:
+            files_in_filesdir = path.glob("*.*")
+            
+            # Delete elements
+            list(map(lambda f: f.unlink(), files_in_filesdir))
+            return True
+        except BaseException as e:
+            print(f"Error: {e}")
+            return False
     
     @staticmethod
     def put_columns(data: DataFrame,_columns: list):

@@ -144,10 +144,8 @@
             
             <div class="btn-group me-2">
               {% if current_user.role_id == 1 %}
-
               <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#fileImport">
                 Import</button>
-
               <div class="modal fade" id="fileImport" tabindex="-1" aria-labelledby="fileModal" aria-hidden="true">
                 <div class="modal-dialog modal-xl">
                   <div class="modal-content">
@@ -205,10 +203,12 @@
               </div>
               {% endif %}
             </div>
+
             <div class="btn-group me-2">
               <button type="button" class="btn btn-sm btn-outline-secondary">Share</button>
               <button type="button" class="btn btn-sm btn-outline-secondary">Export</button>
             </div>
+
             <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -221,6 +221,7 @@
               <span data-feather="calendar" class="align-text-bottom"></span>
               This week
             </button>
+            
           </div>
         </div>
 
@@ -234,6 +235,7 @@
                 <th scope="col">#</th>
                 <th scope="col">ID Empleado</th>
                 <th scope="col">Empleado</th>
+                <th scope="col">Lugar</th>
                 <th scope="col">Mes</th>
                 <th scope="col">Hora de Llegada</th>
               </tr>

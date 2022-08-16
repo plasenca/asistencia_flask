@@ -1,3 +1,4 @@
+from crypt import methods
 import datetime
 
 from app import app
@@ -117,7 +118,7 @@ def file_added():
         file_nicollini = form.file_nicollini.data
         file_ferretero = form.file_ferretero.data
         
-        # Files List
+        # Files Dicc
         dicc_files = {
             "oficina_principal": file_oficina_principal,
             "nicollini":file_nicollini,
@@ -125,23 +126,24 @@ def file_added():
         }
         
         # Conditionals
-        files = file_oficina_principal and file_ferretero and file_nicollini
+        files = file_oficina_principal or file_ferretero or file_nicollini
         
         # If it does exist any file
         if files:
             # Delete all files before adding another one
-            files_in_files = FILES_DIR.glob("*.*")
-            list(map(lambda f: f.unlink(), files_in_files))
+            files_in_filesdir = FILES_DIR.glob("*.*")
+            list(map(lambda f: f.unlink(), files_in_filesdir))
             
             # Store the file
             for name, file in dicc_files.items():
                 if file:
                     format_file = str(file).split(".")[-1]
+                    # If format file is ".dat"
                     if format_file == "dat":
                         # filename = secure_filename(data.filename)
                         filename = f"{name}.dat"
                         file.save(FILES_DIR/filename)
-                        return redirect(url_for("main")), 302
+                        return redirect(url_for("dat_converter")), 302
                     else:
                         flash("Must be a .dat file")
                         return redirect(url_for("main")), 302
@@ -154,6 +156,10 @@ def file_added():
             flash(error, category="error")
             return redirect(url_for("main")), 302
 
+
+@app.route("/dat-converter", methods=["POST"])
+def dat_converter():
+    pass
 
 @app.route("/logout")
 @login_required

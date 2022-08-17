@@ -141,23 +141,30 @@ def file_added():
             if deleted_files:
                 # Store the file
                 for name, file in dicc_files.items():
+                    
                     if file:
-                        format_file = str(file).split(".")[-1]
+                        
+                        format_file = str(file.filename).split(".")[-1]
+                        
                         # If format file is ".dat"
                         if format_file == "dat":
-                            # filename = secure_filename(data.filename)
+                            # filename = secure_filename(file.filename)
                             filename = f"{name}.dat"
                             file.save(FILES_DIR/filename)
-                            return redirect(url_for("dat_converter")), 302
+                            
                         else:
                             flash("Must be .dat files")
                             return redirect(url_for("main")), 302
+                        
                     else:
                         print(f"{name} es {file}")
+                        
+                return redirect(url_for("dat_converter")), 302
+            
             else:
-                flash("""Hubo un error en la subida de archivos. Intente de nuevo por favor\n
-                        Si el error persiste, contactar con soporte.""")
-                raise BaseException(f"No se ha podido eliminar los elementos de la ruta {FILES_DIR}")
+                flash("""There was an error uploading files. Please try again\n
+                        If the error persists, contact support.""")
+                raise BaseException(f"Failed to remove items from path: {FILES_DIR}")
 
         # If it does not exist any file
         if files is None:
@@ -166,7 +173,8 @@ def file_added():
             return redirect(url_for("main")), 302
 
 
-@app.route("/dat-converter", methods=["POST"])
+@app.route("/dat-converter", methods=["GET", "POST"])
+@login_required
 def dat_converter():
     
     datfiles_list = list(FILES_DIR.glob("*.dat"))
@@ -174,17 +182,29 @@ def dat_converter():
     
     # Dataframes 
     df = None
-    df_datfiles_list = list(map(DataManagment._reader_dat, datfiles_list))
+    
+    # Processing Dataframes
+        # Tranform each ".dat" file to DataFrame
+    df_datfiles_list = list(map(DataConverter._reader_dat, datfiles_list))
+        # Adding new columns: "place"
+    df_datfiles_list=list(map(lambda df: df.insert(2, "place", {})))
+        # Delete useless columns
+    index_columns = [[2,3,4,5]]*length_datfiles_list
+    df_datfiles_deleted_columns_list = list(map(DataManagment.delete_columns_by_index, df_datfiles_list, index_columns))
+    
     
     
     if length_datfiles_list > 1:
         for i in range(length_datfiles_list - 1):
             if df is None:
-                df = pd.concat([df_datfiles_list[i], df_datfiles_list[i+1]], ignore_index=True)
+                df = pd.concat([df_datfiles_deleted_columns_list[i], df_datfiles_deleted_columns_list[i+1]], ignore_index=True)
             else:
-                df = pd.concat([df, df_datfiles_list[i+1]], ignore_index=True)
+                df = pd.concat([df, df_datfiles_deleted_columns_list[i+1]], ignore_index=True)
     else:
-        df = df_datfiles_list[-1]
+        df = df_datfiles_deleted_columns_list[0]
+    
+    print(df)
+    return redirect(url_for("main")), 302
     
 
 @app.route("/logout")

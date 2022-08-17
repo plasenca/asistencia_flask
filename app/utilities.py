@@ -113,13 +113,26 @@ class DataManagment:
         """Function to add name columns to Dataframe
         
         Keyword arguments:
-        data  -- DataFrame object
-        *args -- Name columns tuple
+        data     -- DataFrame object
+        _columns -- Name columns tuple
         Return: None
         """
         
         data.columns = _columns
 
+    @staticmethod
+    def delete_columns_by_index(data: DataFrame, _columns: list):
+        """Function to delete columns on Dataframe
+        
+        Keyword arguments:
+        data     -- DataFrame object
+        _columns -- Name columns tuple
+        Return: None
+        """
+        
+        data.drop(data.columns[_columns], inplace=True, axis=1)
+        return data
+    
     @staticmethod
     def join_data():
         pass

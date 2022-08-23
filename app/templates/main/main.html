@@ -241,6 +241,51 @@
               </tr>
             </thead>
             <tbody>
+              {% if file_csv.empty == False %}
+                {% if current_user.role_id == 1 %}
+                  {% for i,row in file_csv.iterrows() %}
+                    <tr>
+                      <td {% if row['arrive_time'] >= '2022-07-01 00:00:00'|date("%Y-%m-%d %H:%M:%S") %}
+                        class="table-danger"
+                        {% endif %}>
+                        {{i}}
+                      </td>
+                      <td {% if row['arrive_time'] >= '2022-07-01 00:00:00'|date("%Y-%m-%d %H:%M:%S") %}
+                        class="table-danger"
+                        {% endif %}>
+                        {{row['id_employee']}}
+                      </td>
+                      <td {% if row['arrive_time'] >= '2022-07-01 00:00:00'|date("%Y-%m-%d %H:%M:%S") %}
+                        class="table-danger"
+                        {% endif %}>
+                        {{row['employee_name']}}
+                      </td>
+                      <td {% if row['arrive_time'] >= '2022-07-01 00:00:00'|date("%Y-%m-%d %H:%M:%S") %}
+                          class="table-danger"
+                          {% endif %}>
+                        {{row['location']|string}}
+                      </td>
+                      <td {% if row['arrive_time'] >= '2022-07-01 00:00:00'|date("%Y-%m-%d %H:%M:%S") %}
+                        class="table-danger"
+                        {% endif %}>
+                        {{row['month']}}
+                      </td>
+                      <td {% if row['arrive_time'] >= '2022-07-01 00:00:00'|date("%Y-%m-%d %H:%M:%S") %}
+                        class="table-danger"
+                        {% endif %}>
+                        {{row['arrive_hour']}}
+                      </td>
+                    </tr>
+                  {% endfor %}
+                {% endif %}
+              {% else %}
+                <th scope="col" class="table-warning">None</th>
+                <th scope="col" class="table-warning">No data</th>
+                <th scope="col" class="table-warning">No data</th>
+                <th scope="col" class="table-warning">No data</th>
+                <th scope="col" class="table-warning">No data</th>
+                <th scope="col" class="table-warning">No data</th>
+              {% endif %}
 
             </tbody>
           </table>

@@ -95,6 +95,9 @@ class Employee(db.Model):
     __tablename__ = "employee"
     
     id = db.Column(db.Integer(), primary_key=True)
+    
+    #TODO: Crear foreing key para employee_id y location_id
+    # employee_id = 
     first_name = db.Column(db.String(50), nullable=False)
     last_name = db.Column(db.String(50), nullable=False)
     
@@ -112,10 +115,11 @@ class Assistance(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     
     employee_id = db.Column(db.Integer(), nullable=False)
-    employee_name = db.Column(db.String(), nullable=False)
-    place = db.Column(db.String(), nullable=False)
+    arrive_time = db.Column(db.DateTime(), nullable=False)
+    location = db.Column(db.String(), nullable=False)
     month = db.Column(db.String(), nullable=False)
-    time_arrive = db.Column(db.DateTime(), nullable=False)
+    arrive_hour = db.Column(db.String(), nullable=False)
+    
 
 
 # Create Forms

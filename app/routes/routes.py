@@ -102,12 +102,16 @@ def login():
 @login_required
 def main():
     form = FileLoader()
+    path_file = FILES_DIR/"final_data.csv"
+    # If it exists the csv file
+    file = path_file if path_file.is_file() else None
     
-    # files = [f for f in FILES_DIR.iterdir()]
-    # file = files[0]
-    # file_csv = DataConverter.to_format_time(file, columns=["arrive_time"], format_time = "%Y-%m-%d %H:%M:%S")
-
-    return render_template('main/main.html', form=form), 200
+    if file:
+        file_csv = DataConverter._to_format_time(file, columns=["arrive_time"], format_time = "%Y-%m-%d %H:%M:%S")
+    else:
+        file_csv = None
+    
+    return render_template('main/main.html', form=form, file_csv=file_csv), 200
 
 @app.route('/file-added', methods=["POST"])
 @login_required
@@ -182,33 +186,40 @@ def dat_converter():
     datfiles_dicc = {data.name.split(".")[0]:data 
                     for data in datfiles_list}
     
-    # datfiles_list = list(FILES_DIR.glob("*.dat"))
     length_datfiles_list = datfiles_dicc.__len__()
     
     # Dataframes 
     df = None
-    df_datfiles_list = []
+    df_datfiles_list_newcolumn = []
     
     # Processing Dataframes
         # Tranform each ".dat" file to DataFrame
-    for name, file in datfiles_dicc:
+    for name, file in datfiles_dicc.items():
         
-        df_datfiles_list = list(map(DataConverter._reader_dat, datfiles_dicc.values()))
+        # Adding new columns: "place"
         match name:
             case "oficina_principal":
-                df_datfiles_list = list(map(lambda df: df.insert(2, "place", [1] ,allow_duplicates=True))))
+                
+                df_temporary = DataConverter._reader_dat(file)
+                # df.insert(index column, name column, value to add, allow_duplicates=False )
+                df_temporary.insert(2, "place", 2 ,allow_duplicates=False) # Es mutable
+                df_datfiles_list_newcolumn.append(df_temporary) 
             case "nicollini":
-                pass
+                
+                df_temporary = DataConverter._reader_dat(file)
+                df_temporary.insert(2, "place", 3 ,allow_duplicates=False)
+                df_datfiles_list_newcolumn.append(df_temporary) 
             case "ferretero":
-                pass
+                
+                df_temporary = DataConverter._reader_dat(file)
+                df_temporary.insert(2, "place", 4 ,allow_duplicates=False)
+                df_datfiles_list_newcolumn.append(df_temporary)  
 
-        # Adding new columns: "place"
         # Delete useless columns
-    index_columns = [[2,3,4,5]]*length_datfiles_list
-    df_datfiles_deleted_columns_list = list(map(DataManagment.delete_columns_by_index, df_datfiles_list, index_columns))
+    index_columns = [[3,4,5,6]]*length_datfiles_list
+    df_datfiles_deleted_columns_list = list(map(DataManagment.delete_columns_by_index, df_datfiles_list_newcolumn, index_columns))
     
-    
-    
+    # If there's more than one file
     if length_datfiles_list > 1:
         for i in range(length_datfiles_list - 1):
             if df is None:
@@ -218,7 +229,18 @@ def dat_converter():
     else:
         df = df_datfiles_deleted_columns_list[0]
     
-    print(df)
+    # Sort and creating nedded columns: "month"
+    df.columns = ["employee_id", "arrive_time", "location"]
+    df["arrive_time"] = pd.to_datetime(df["arrive_time"], format="%Y-%m-%d %H:%M:%S")
+        # Create month column: str | format: Str Month
+    df["month"] = df["arrive_time"].apply(lambda m: m.strftime("%B"))
+        # Create arrive_hour column: str | format = 00:00:00 AM/PM
+    df["arrive_hour"] = df["arrive_time"].apply(lambda d: d.time().strftime(format="%X %p"))
+    
+    df.info()
+    # Create a ".csv" file with the whole data converted
+    df.to_csv(FILES_DIR/"final_data.csv")
+    
     return redirect(url_for("main")), 302
     
 

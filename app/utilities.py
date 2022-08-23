@@ -117,7 +117,6 @@ class DataManagment:
         _columns -- Name columns tuple
         Return: None
         """
-        
         data.columns = _columns
 
     @staticmethod

@@ -177,17 +177,32 @@ def file_added():
 @login_required
 def dat_converter():
     
+    # Get dicc paths
     datfiles_list = list(FILES_DIR.glob("*.dat"))
-    length_datfiles_list = datfiles_list.__len__()
+    datfiles_dicc = {data.name.split(".")[0]:data 
+                    for data in datfiles_list}
+    
+    # datfiles_list = list(FILES_DIR.glob("*.dat"))
+    length_datfiles_list = datfiles_dicc.__len__()
     
     # Dataframes 
     df = None
+    df_datfiles_list = []
     
     # Processing Dataframes
         # Tranform each ".dat" file to DataFrame
-    df_datfiles_list = list(map(DataConverter._reader_dat, datfiles_list))
+    for name, file in datfiles_dicc:
+        
+        df_datfiles_list = list(map(DataConverter._reader_dat, datfiles_dicc.values()))
+        match name:
+            case "oficina_principal":
+                df_datfiles_list = list(map(lambda df: df.insert(2, "place", [1] ,allow_duplicates=True))))
+            case "nicollini":
+                pass
+            case "ferretero":
+                pass
+
         # Adding new columns: "place"
-    df_datfiles_list=list(map(lambda df: df.insert(2, "place", {})))
         # Delete useless columns
     index_columns = [[2,3,4,5]]*length_datfiles_list
     df_datfiles_deleted_columns_list = list(map(DataManagment.delete_columns_by_index, df_datfiles_list, index_columns))

@@ -9,7 +9,9 @@ from flask import url_for
 from flask import request
 from flask import redirect
 from flask import render_template
-from constants import BASE_DIR, FILES_DIR
+from constants import FILES_DIR
+from constants import DICC_MONTHS
+from constants import LOCATIONS
 from psycopg2 import DatabaseError
 from utilities import DataConverter
 from utilities import DataManagment
@@ -19,8 +21,9 @@ from flask_login import logout_user
 from flask_login import login_required
 from werkzeug.utils import secure_filename
 from models.models import FileLoader
-from models.models import RegisterForms
 from models.models import Assistance
+from models.models import FilterForm
+from models.models import RegisterForms
 from models.models import LoginForm, PageRegisterForm
 
 
@@ -100,21 +103,51 @@ def login():
                     flash(error)
     return render_template('login/login.html', form=form, request=request), 200
 
-@app.route('/main', methods=["GET"])
+@app.route('/main', methods=["GET", "POST"])
 @login_required
 def main():
     form = FileLoader()
+    filter_form = FilterForm()
+    
     # Query to get all the assistance data
-    query = """select e.employee_id, e.first_name, e.last_name, concat(e.first_name, ' ' , e.last_name) full_name,  l.place, a."month", a.arrive_hour  from employee e 
+    query = """select e.employee_id, e.first_name, e.last_name, concat(e.first_name, ' ' , e.last_name) full_name,  l.place, a."month", a."date" ,a.arrive_hour  from employee e 
                 inner join locations l  on l.id=e.location_id 
                 inner join assistance a on  a.employee_id = e.employee_id;"""
     
     table_assistance = db.session.execute(query).all()
-    table_assistance = pd.DataFrame(table_assistance, columns=["employee_id", "first_name", "last_name", "full_name", "location", "month", "arrive_hour"])
+    table_assistance = pd.DataFrame(table_assistance, columns=["employee_id", "first_name", "last_name", "full_name", "location", "month", "arrive_hour", "date"])
     table_assistance["arrive_time"] = table_assistance["arrive_hour"].apply(lambda x: datetime.datetime.strptime(x, "%X %p"))
     
+    if request.method == "POST":
+    # Get any filter table
+        # Change default filter to form sent by the user
+        filter_form.employee_name.default = filter_form.employee_name.data
+        filter_form.location.default = filter_form.location.data
+        filter_form.month.default = filter_form.month.data
+        # Filter table by the form sent by the user
+            # Convert values sent by user to values soported
+        location_sent = [value for name, value in LOCATIONS.items() if int(filter_form.location.data)==name]
+        month_sent = [value for name, value in DICC_MONTHS.items() if int(filter_form.month.data)==name]
+
+        if int(filter_form.employee_name.data) == 0 and int(filter_form.location.data) == 0:
+            table_assistance = table_assistance.loc[(table_assistance["month"] == month_sent[0])]
+            print(table_assistance)
+            return render_template('main/main.html', form=form, filter_form=filter_form , table=table_assistance), 200
+        
+        if int(filter_form.employee_name.data) == 0:
+            table_assistance = table_assistance.loc[(table_assistance["location"] == location_sent[0]) & (table_assistance["month"] == month_sent[0])]
+            print(table_assistance)
+            return render_template('main/main.html', form=form, filter_form=filter_form , table=table_assistance), 200
+        
+        if int(filter_form.location.data) == 0:
+            table_assistance = table_assistance.loc[(table_assistance["employee_id"] == int(filter_form.employee_name.data)) & (table_assistance["month"] == month_sent[0])]
+            print(table_assistance)
+            return render_template('main/main.html', form=form, filter_form=filter_form , table=table_assistance), 200
+        
+        table_assistance = table_assistance.loc[(table_assistance["employee_id"] == int(filter_form.employee_name.data)) & (table_assistance["location"] == location_sent[0]) & (table_assistance["month"] == month_sent[0])]
+        print(table_assistance)
     
-    return render_template('main/main.html', form=form, table=table_assistance), 200
+    return render_template('main/main.html', form=form, filter_form=filter_form , table=table_assistance), 200
 
 @app.route('/file-added', methods=["POST"])
 @login_required
@@ -239,6 +272,8 @@ def dat_converter():
     df["month"] = df["arrive_time"].apply(lambda m: m.strftime("%B"))
         # Create arrive_hour column: str | format = 00:00:00 AM/PM
     df["arrive_hour"] = df["arrive_time"].apply(lambda d: d.time().strftime(format="%X %p"))
+        # Create date column: str | format: %Y-%m-%d
+    df["date"] = df["arrive_time"].apply(lambda d: d.date().strftime(format="%Y-%m-%d"))
     
     # df.info()
     

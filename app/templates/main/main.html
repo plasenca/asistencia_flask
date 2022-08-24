@@ -209,18 +209,26 @@
               <button type="button" class="btn btn-sm btn-outline-secondary">Export</button>
             </div>
 
-            <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                class="feather feather-calendar align-text-bottom" aria-hidden="true">
-                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                <line x1="16" y1="2" x2="16" y2="6"></line>
-                <line x1="8" y1="2" x2="8" y2="6"></line>
-                <line x1="3" y1="10" x2="21" y2="10"></line>
-              </svg>
-              <span data-feather="calendar" class="align-text-bottom"></span>
-              This week
-            </button>
+            <form action="/main" method="post">
+              {{filter_form.csrf_token}}
+              <div class="dropdown">
+                <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle bi bi-filter" data-bs-toggle="dropdown" aria-expanded="false">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-filter" viewBox="0 0 16 16">
+                    <path d="M6 10.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5zm-2-3a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm-2-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5z"/>
+                  </svg>
+                </button>
+  
+                <div class="dropdown-menu p-5">
+                  <div class="d-flex flex-column mb-3">
+                    {{filter_form.employee_name}}
+                    {{filter_form.location}}
+                    {{filter_form.month}}
+                    {{filter_form.submit}}
+                  </div>
+                </div>
+            </form>
+
+            </div>
             
           </div>
         </div>

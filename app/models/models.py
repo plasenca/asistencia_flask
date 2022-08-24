@@ -2,6 +2,7 @@ import pandas as pd
 
 from app import db
 from app import login_manager, app
+from datetime import datetime
 from flask_wtf import FlaskForm
 from flask_user import UserMixin
 from flask_user import UserManager
@@ -88,6 +89,9 @@ class Location(db.Model):
     locations = db.relationship("Employee", 
                             backref=db.backref("location"))
     
+    @classmethod
+    def get_all(cls):
+        return cls.query.all()
     # Create the Employee class with db.Model
 
 class Employee(db.Model):
@@ -105,6 +109,10 @@ class Employee(db.Model):
     # Relationship Fields
     location_id = db.Column(db.Integer, db.ForeignKey("locations.id"))
     
+    @classmethod
+    def get_all(cls):
+        return cls.query.all()
+    
 
 class Assistance(db.Model):
     """
@@ -118,7 +126,8 @@ class Assistance(db.Model):
     employee_id = db.Column(db.Integer(), nullable=False)
     arrive_time = db.Column(db.DateTime(), nullable=False)
     location = db.Column(db.String(), nullable=False)
-    month = db.Column(db.String(), nullable=False)
+    month = db.Column(db.String())
+    date = db.Column(db.String())
     arrive_hour = db.Column(db.String(), nullable=False)
     
     @staticmethod
@@ -172,10 +181,32 @@ class FileLoader(FlaskForm):
     submit = SubmitField()
 
 
+# Get employees id from the database to use in the form selection
+with app.app_context():
+    employees = Employee.get_all()
+    choices_employee = [(0, "Todos")]
+    choices_employee_to_add = [(employee.employee_id, f"{employee.first_name} {employee.last_name}") for employee in employees]
+    choices_employee.extend(choices_employee_to_add)
+    
+
+# Get locations id from the database to use in the form selection
+with app.app_context():
+    locations = Location.get_all()
+    choices_location = [(0, "Todos")]
+    choices_employee_to_add = [(location.id, location.place) for location in locations]
+    choices_location.extend(choices_employee_to_add)
+
 class FilterForm(FlaskForm):
-    # employee_name = SelectField("Empleado", choices=[(0, "Todos"), 
-    #                                                  (1, )]
-    pass
+    employee_name = SelectField("Empleado", choices=choices_employee, default=0)
+    location = SelectField("Tienda", choices=choices_location, default=0)
+    month = SelectField("Mes", choices=[(1, "January"), (2, "February"), (3, "March"), 
+                                        (4, "April"), (5, "May"), (6, "June"), 
+                                        (7, "July"), (8, "August"), (9, "September"), 
+                                        (10, "October"), (11, "November"), (12, "Dicember")], 
+                                default=datetime.now().month)
+    submit = SubmitField()
+
+
 # Configurations
 
 @login_manager.user_loader

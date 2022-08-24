@@ -1,3 +1,5 @@
+import pandas as pd
+
 from app import db
 from app import login_manager, app
 from flask_wtf import FlaskForm
@@ -96,8 +98,7 @@ class Employee(db.Model):
     
     id = db.Column(db.Integer(), primary_key=True)
     
-    #TODO: Crear foreing key para employee_id y location_id
-    # employee_id = 
+    employee_id = db.Column(db.Integer())
     first_name = db.Column(db.String(50), nullable=False)
     last_name = db.Column(db.String(50), nullable=False)
     
@@ -107,7 +108,7 @@ class Employee(db.Model):
 
 class Assistance(db.Model):
     """
-    Table to store the assistance
+    Table to store the no completed assistance
     """
     
     __tablename__ = "assistance"
@@ -120,6 +121,14 @@ class Assistance(db.Model):
     month = db.Column(db.String(), nullable=False)
     arrive_hour = db.Column(db.String(), nullable=False)
     
+    @staticmethod
+    def save_assistance(df:pd.DataFrame):
+        # Erase all the data in the table
+        Assistance.query.delete()
+        db.session.commit()
+        
+        # As it's a df
+        df.to_sql(name="assistance", con=db.engine, if_exists="append", index=False)
 
 
 # Create Forms
@@ -162,6 +171,11 @@ class FileLoader(FlaskForm):
     file_ferretero = FileField(label="Tienda Ferretero")
     submit = SubmitField()
 
+
+class FilterForm(FlaskForm):
+    # employee_name = SelectField("Empleado", choices=[(0, "Todos"), 
+    #                                                  (1, )]
+    pass
 # Configurations
 
 @login_manager.user_loader

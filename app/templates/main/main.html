@@ -225,11 +225,11 @@
           </div>
         </div>
 
-        <canvas class="my-4 w-100" id="myChart" width="900" height="380"></canvas>
+        <!-- <canvas class="my-4 w-100" id="myChart" width="900" height="380"></canvas> -->
 
         <h2>Asistencia</h2>
         <div class="table-responsive">
-          <table class="table table-striped table-sm">
+          <table class="table table-striped table-sm" id="table">
             <thead class="thead-dark">
               <tr>
                 <th scope="col">#</th>
@@ -241,36 +241,36 @@
               </tr>
             </thead>
             <tbody>
-              {% if file_csv.empty == False %}
+              {% if table.empty == False %}
                 {% if current_user.role_id == 1 %}
-                  {% for i,row in file_csv.iterrows() %}
+                  {% for i,row in table.iterrows() %}
                     <tr>
-                      <td {% if row['arrive_time'] >= '2022-07-01 00:00:00'|date("%Y-%m-%d %H:%M:%S") %}
+                      <td {% if row['arrive_time'] >= '08:40:00 AM'|date("%X %p") and row['arrive_time'] <= '10:30:00 AM'|date("%X %p") %}
                         class="table-danger"
                         {% endif %}>
                         {{i}}
                       </td>
-                      <td {% if row['arrive_time'] >= '2022-07-01 00:00:00'|date("%Y-%m-%d %H:%M:%S") %}
+                      <td {% if row['arrive_time'] >= '08:40:00 AM'|date("%X %p") and row['arrive_time'] <= '10:30:00 AM'|date("%X %p") %}
                         class="table-danger"
                         {% endif %}>
-                        {{row['id_employee']}}
+                        {{row['employee_id']}}
                       </td>
-                      <td {% if row['arrive_time'] >= '2022-07-01 00:00:00'|date("%Y-%m-%d %H:%M:%S") %}
+                      <td {% if row['arrive_time'] >= '08:40:00 AM'|date("%X %p") and row['arrive_time'] <= '10:30:00 AM'|date("%X %p") %}
                         class="table-danger"
                         {% endif %}>
-                        {{row['employee_name']}}
+                        {{row['full_name']}}
                       </td>
-                      <td {% if row['arrive_time'] >= '2022-07-01 00:00:00'|date("%Y-%m-%d %H:%M:%S") %}
+                      <td {% if row['arrive_time'] >= '08:40:00 AM'|date("%X %p") and row['arrive_time'] <= '10:30:00 AM'|date("%X %p") %}
                           class="table-danger"
                           {% endif %}>
-                        {{row['location']|string}}
+                        {{row['location']}}
                       </td>
-                      <td {% if row['arrive_time'] >= '2022-07-01 00:00:00'|date("%Y-%m-%d %H:%M:%S") %}
+                      <td {% if row['arrive_time'] >= '08:40:00 AM'|date("%X %p") and row['arrive_time'] <= '10:30:00 AM'|date("%X %p") %}
                         class="table-danger"
                         {% endif %}>
                         {{row['month']}}
                       </td>
-                      <td {% if row['arrive_time'] >= '2022-07-01 00:00:00'|date("%Y-%m-%d %H:%M:%S") %}
+                      <td {% if row['arrive_time'] >= '08:40:00 AM'|date("%X %p") and row['arrive_time'] <= '10:30:00 AM'|date("%X %p") %}
                         class="table-danger"
                         {% endif %}>
                         {{row['arrive_hour']}}

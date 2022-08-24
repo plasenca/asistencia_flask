@@ -2,6 +2,7 @@ import datetime
 import pandas as pd
 
 from app import app
+from app import db
 from flask import flash
 from flask import Markup
 from flask import url_for
@@ -18,7 +19,8 @@ from flask_login import logout_user
 from flask_login import login_required
 from werkzeug.utils import secure_filename
 from models.models import FileLoader
-from models.models import RegisterForms, Role
+from models.models import RegisterForms
+from models.models import Assistance
 from models.models import LoginForm, PageRegisterForm
 
 
@@ -102,16 +104,17 @@ def login():
 @login_required
 def main():
     form = FileLoader()
-    path_file = FILES_DIR/"final_data.csv"
-    # If it exists the csv file
-    file = path_file if path_file.is_file() else None
+    # Query to get all the assistance data
+    query = """select e.employee_id, e.first_name, e.last_name, concat(e.first_name, ' ' , e.last_name) full_name,  l.place, a."month", a.arrive_hour  from employee e 
+                inner join locations l  on l.id=e.location_id 
+                inner join assistance a on  a.employee_id = e.employee_id;"""
     
-    if file:
-        file_csv = DataConverter._to_format_time(file, columns=["arrive_time"], format_time = "%Y-%m-%d %H:%M:%S")
-    else:
-        file_csv = None
+    table_assistance = db.session.execute(query).all()
+    table_assistance = pd.DataFrame(table_assistance, columns=["employee_id", "first_name", "last_name", "full_name", "location", "month", "arrive_hour"])
+    table_assistance["arrive_time"] = table_assistance["arrive_hour"].apply(lambda x: datetime.datetime.strptime(x, "%X %p"))
     
-    return render_template('main/main.html', form=form, file_csv=file_csv), 200
+    
+    return render_template('main/main.html', form=form, table=table_assistance), 200
 
 @app.route('/file-added', methods=["POST"])
 @login_required
@@ -237,12 +240,13 @@ def dat_converter():
         # Create arrive_hour column: str | format = 00:00:00 AM/PM
     df["arrive_hour"] = df["arrive_time"].apply(lambda d: d.time().strftime(format="%X %p"))
     
-    df.info()
-    # Create a ".csv" file with the whole data converted
-    df.to_csv(FILES_DIR/"final_data.csv")
+    # df.info()
+    
+    # Save all data in the database
+    Assistance.save_assistance(df)
     
     return redirect(url_for("main")), 302
-    
+
 
 @app.route("/logout")
 @login_required

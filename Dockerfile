@@ -111,4 +111,6 @@ RUN set -eux; \
 	\
 	pip --version
 
-CMD [ "python3", "-m" , "flask", "run", "--host=0.0.0.0"]
+RUN pip install -r requirements.txt
+
+CMD ["python3", "-m", "flask", "run", "--host=0.0.0.0", "--port=5000"]

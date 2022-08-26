@@ -181,22 +181,22 @@ class FileLoader(FlaskForm):
     submit = SubmitField()
 
 
-# Get employees id from the database to use in the form selection
-with app.app_context():
-    employees = Employee.get_all()
-    choices_employee = [(0, "Todos")]
-    choices_employee_to_add = [(employee.employee_id, f"{employee.first_name} {employee.last_name}") for employee in employees]
-    choices_employee.extend(choices_employee_to_add)
+class FilterForm(FlaskForm):
+    # Get employees id from the database to use in the form selection
+    with app.app_context():
+        employees = Employee.get_all()
+        choices_employee = [(0, "Todos")]
+        choices_employee_to_add = [(employee.employee_id, f"{employee.first_name} {employee.last_name}") for employee in employees]
+        choices_employee.extend(choices_employee_to_add)
     
 
-# Get locations id from the database to use in the form selection
-with app.app_context():
-    locations = Location.get_all()
-    choices_location = [(0, "Todos")]
-    choices_employee_to_add = [(location.id, location.place) for location in locations]
-    choices_location.extend(choices_employee_to_add)
+# # Get locations id from the database to use in the form selection
+    with app.app_context():
+        locations = Location.get_all()
+        choices_location = [(0, "Todos")]
+        choices_employee_to_add = [(location.id, location.place) for location in locations]
+        choices_location.extend(choices_employee_to_add)
 
-class FilterForm(FlaskForm):
     employee_name = SelectField("Empleado", choices=choices_employee, default=0)
     location = SelectField("Tienda", choices=choices_location, default=0)
     month = SelectField("Mes", choices=[(1, "January"), (2, "February"), (3, "March"), 

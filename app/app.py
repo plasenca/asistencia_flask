@@ -9,7 +9,7 @@ from flask_sqlalchemy import SQLAlchemy
 # App initialization
 app = Flask(__name__)
 # Setting configuration
-app.config.from_object(config["development"])
+app.config.from_object(config["production"])
 
 # Incializa el login manager
 login_manager = LoginManager()

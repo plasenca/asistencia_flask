@@ -240,12 +240,12 @@
           <table class="table table-striped table-sm" id="table">
             <thead class="thead-dark">
               <tr>
-                <th scope="col">#</th>
                 <th scope="col">ID Empleado</th>
                 <th scope="col">Empleado</th>
                 <th scope="col">Lugar</th>
                 <th scope="col">Mes</th>
                 <th scope="col">Hora de Llegada</th>
+                <th scope="col">Fecha</th>
               </tr>
             </thead>
             <tbody>
@@ -253,11 +253,6 @@
                 {% if current_user.role_id == 1 %}
                   {% for i,row in table.iterrows() %}
                     <tr>
-                      <td {% if row['arrive_time'] >= '08:40:00 AM'|date("%X %p") and row['arrive_time'] <= '10:30:00 AM'|date("%X %p") %}
-                        class="table-danger"
-                        {% endif %}>
-                        {{i}}
-                      </td>
                       <td {% if row['arrive_time'] >= '08:40:00 AM'|date("%X %p") and row['arrive_time'] <= '10:30:00 AM'|date("%X %p") %}
                         class="table-danger"
                         {% endif %}>
@@ -283,11 +278,17 @@
                         {% endif %}>
                         {{row['arrive_hour']}}
                       </td>
+                      <td {% if row['arrive_time'] >= '08:40:00 AM'|date("%X %p") and row['arrive_time'] <= '10:30:00 AM'|date("%X %p") %}
+                        class="table-danger"
+                        {% endif %}>
+                        {{row['date']}}
+                      </td>
                     </tr>
                   {% endfor %}
                 {% endif %}
               {% else %}
                 <th scope="col" class="table-warning">None</th>
+                <th scope="col" class="table-warning">No data</th>
                 <th scope="col" class="table-warning">No data</th>
                 <th scope="col" class="table-warning">No data</th>
                 <th scope="col" class="table-warning">No data</th>

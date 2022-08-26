@@ -110,13 +110,14 @@ def main():
     filter_form = FilterForm()
     
     # Query to get all the assistance data
-    query = """select e.employee_id, e.first_name, e.last_name, concat(e.first_name, ' ' , e.last_name) full_name,  l.place, a."month", a."date" ,a.arrive_hour  from employee e 
+    query = """select e.employee_id, e.first_name, e.last_name, concat(e.first_name, ' ' , e.last_name) full_name,  l.place, a."month",a.arrive_hour, a."date"   from employee e 
                 inner join locations l  on l.id=e.location_id 
                 inner join assistance a on  a.employee_id = e.employee_id;"""
     
     table_assistance = db.session.execute(query).all()
     table_assistance = pd.DataFrame(table_assistance, columns=["employee_id", "first_name", "last_name", "full_name", "location", "month", "arrive_hour", "date"])
     table_assistance["arrive_time"] = table_assistance["arrive_hour"].apply(lambda x: datetime.datetime.strptime(x, "%X %p"))
+    print(table_assistance)
     
     if request.method == "POST":
     # Get any filter table
@@ -130,6 +131,7 @@ def main():
         month_sent = [value for name, value in DICC_MONTHS.items() if int(filter_form.month.data)==name]
 
         if int(filter_form.employee_name.data) == 0 and int(filter_form.location.data) == 0:
+            print(month_sent)
             table_assistance = table_assistance.loc[(table_assistance["month"] == month_sent[0])]
             print(table_assistance)
             return render_template('main/main.html', form=form, filter_form=filter_form , table=table_assistance), 200

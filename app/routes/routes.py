@@ -1,23 +1,31 @@
 import datetime
+import pandas as pd
 
 from app import app
+from app import db
 from flask import flash
 from flask import Markup
 from flask import url_for
 from flask import request
 from flask import redirect
 from flask import render_template
-from constants import BASE_DIR, FILES_DIR
+from constants import FILES_DIR
+from constants import DICC_MONTHS
+from constants import LOCATIONS
 from psycopg2 import DatabaseError
+from utilities import DataConverter
+from utilities import DataManagment
 from flask_login import login_user
 from flask_login import current_user
 from flask_login import logout_user
 from flask_login import login_required
 from werkzeug.utils import secure_filename
 from models.models import FileLoader
-from models.models import RegisterForms, Role
+from models.models import Assistance
+from models.models import FilterForm
+from models.models import RegisterForms
 from models.models import LoginForm, PageRegisterForm
-from utilities.utilities import DataConverter
+
 
 # Base URL redirect to login 
 @app.route('/')
@@ -39,7 +47,6 @@ def registro():
                 "first_name": form.first_name.data,
                 "last_name": form.last_name.data,
                 "work_id": form.work_id.data,
-                "employee_id": 0,
                 "role_id": 2
             }
             
@@ -56,7 +63,6 @@ def registro():
                                     first_name=register_user["first_name"],
                                     last_name=register_user["last_name"],
                                     work_id=register_user["work_id"],
-                                    employee_id=register_user["employee_id"],
                                     role_id=register_user["role_id"])
                 user.set_password(register_user["password"])
                 user.save()
@@ -97,41 +103,181 @@ def login():
                     flash(error)
     return render_template('login/login.html', form=form, request=request), 200
 
-@app.route('/main', methods=["GET"])
+@app.route('/main', methods=["GET", "POST"])
 @login_required
 def main():
     form = FileLoader()
+    filter_form = FilterForm()
     
-    files = [f for f in FILES_DIR.iterdir()]
-    file = files[0]
-    file_csv = DataConverter.to_format_time(file, columns=["arrive_time"], format_time = "%Y-%m-%d %H:%M:%S")
+    # Query to get all the assistance data
+    query = """select e.employee_id, e.first_name, e.last_name, concat(e.first_name, ' ' , e.last_name) full_name,  l.place, a."month",a.arrive_hour, a."date"   from employee e 
+                inner join locations l  on l.id=e.location_id 
+                inner join assistance a on  a.employee_id = e.employee_id;"""
+    
+    table_assistance = db.session.execute(query).all()
+    table_assistance = pd.DataFrame(table_assistance, columns=["employee_id", "first_name", "last_name", "full_name", "location", "month", "arrive_hour", "date"])
+    table_assistance["arrive_time"] = table_assistance["arrive_hour"].apply(lambda x: datetime.datetime.strptime(x, "%X %p"))
+    print(table_assistance)
+    
+    if request.method == "POST":
+    # Get any filter table
+        # Change default filter to form sent by the user
+        filter_form.employee_name.default = filter_form.employee_name.data
+        filter_form.location.default = filter_form.location.data
+        filter_form.month.default = filter_form.month.data
+        # Filter table by the form sent by the user
+            # Convert values sent by user to values soported
+        location_sent = [value for name, value in LOCATIONS.items() if int(filter_form.location.data)==name]
+        month_sent = [value for name, value in DICC_MONTHS.items() if int(filter_form.month.data)==name]
 
-    return render_template('main/main.html', form=form, file_csv=file_csv), 200
+        if int(filter_form.employee_name.data) == 0 and int(filter_form.location.data) == 0:
+            table_assistance = table_assistance.loc[(table_assistance["month"] == month_sent[0])]
+            return render_template('main/main.html', form=form, filter_form=filter_form , table=table_assistance), 200
+        
+        if int(filter_form.employee_name.data) == 0:
+            table_assistance = table_assistance.loc[(table_assistance["location"] == location_sent[0]) & (table_assistance["month"] == month_sent[0])]
+            return render_template('main/main.html', form=form, filter_form=filter_form , table=table_assistance), 200
+        
+        if int(filter_form.location.data) == 0:
+            table_assistance = table_assistance.loc[(table_assistance["employee_id"] == int(filter_form.employee_name.data)) & (table_assistance["month"] == month_sent[0])]
+            return render_template('main/main.html', form=form, filter_form=filter_form , table=table_assistance), 200
+        
+        table_assistance = table_assistance.loc[(table_assistance["employee_id"] == int(filter_form.employee_name.data)) & (table_assistance["location"] == location_sent[0]) & (table_assistance["month"] == month_sent[0])]
+    
+    return render_template('main/main.html', form=form, filter_form=filter_form , table=table_assistance), 200
 
 @app.route('/file-added', methods=["POST"])
 @login_required
 def file_added():
+    
     form = FileLoader()
+    data_manager = DataManagment()
+    
     if form.validate_on_submit():
         
-        file = form.file.data
-        # If it does exist any file
-        if file:
-
-            # Eliminar todos los ficheros antes de agregar otro
-            files_in_files = FILES_DIR.glob("*.*")
-            list(map(lambda f: f.unlink(), files_in_files))
-            
-            # Guardar el fichero enviado
-            filename = secure_filename(file.filename)
-            file.save(FILES_DIR/filename)
-            return redirect(url_for("main")), 302
+        file_oficina_principal = form.file_oficina_principal.data
+        file_nicollini = form.file_nicollini.data
+        file_ferretero = form.file_ferretero.data
         
+        # Files Dicc
+        dicc_files = {
+            "oficina_principal": file_oficina_principal,
+            "nicollini":file_nicollini,
+            "ferretero": file_ferretero
+        }
+        
+        # Conditionals
+        files = file_oficina_principal or file_ferretero or file_nicollini
+        
+        # If it does exist any file
+        if files:
+            # Delete all files before adding another one
+            deleted_files = data_manager._delete_files(FILES_DIR)
+            
+            # If it cannot delete files
+            if deleted_files:
+                # Store the file
+                for name, file in dicc_files.items():
+                    
+                    if file:
+                        
+                        format_file = str(file.filename).split(".")[-1]
+                        
+                        # If format file is ".dat"
+                        if format_file == "dat":
+                            # filename = secure_filename(file.filename)
+                            filename = f"{name}.dat"
+                            file.save(FILES_DIR/filename)
+                            
+                        else:
+                            flash("Must be .dat files")
+                            return redirect(url_for("main")), 302
+                        
+                    else:
+                        print(f"{name} es {file}")
+                        
+                return redirect(url_for("dat_converter")), 302
+            
+            else:
+                flash("""There was an error uploading files. Please try again\n
+                        If the error persists, contact support.""")
+                raise BaseException(f"Failed to remove items from path: {FILES_DIR}")
+
         # If it does not exist any file
-        if file is None:
-            not_file = "Does not exist any file to upload"
-            flash(not_file, category="error")
+        if files is None:
+            error = "Missing a file to upload"
+            flash(error, category="error")
             return redirect(url_for("main")), 302
+
+
+@app.route("/dat-converter", methods=["GET", "POST"])
+@login_required
+def dat_converter():
+    
+    # Get dicc paths
+    datfiles_list = list(FILES_DIR.glob("*.dat"))
+    datfiles_dicc = {data.name.split(".")[0]:data 
+                    for data in datfiles_list}
+    
+    length_datfiles_list = datfiles_dicc.__len__()
+    
+    # Dataframes 
+    df = None
+    df_datfiles_list_newcolumn = []
+    
+    # Processing Dataframes
+        # Tranform each ".dat" file to DataFrame
+    for name, file in datfiles_dicc.items():
+        
+        # Adding new columns: "place"
+        match name:
+            case "oficina_principal":
+                
+                df_temporary = DataConverter._reader_dat(file)
+                # df.insert(index column, name column, value to add, allow_duplicates=False )
+                df_temporary.insert(2, "place", 2 ,allow_duplicates=False) # Es mutable
+                df_datfiles_list_newcolumn.append(df_temporary) 
+            case "nicollini":
+                
+                df_temporary = DataConverter._reader_dat(file)
+                df_temporary.insert(2, "place", 3 ,allow_duplicates=False)
+                df_datfiles_list_newcolumn.append(df_temporary) 
+            case "ferretero":
+                
+                df_temporary = DataConverter._reader_dat(file)
+                df_temporary.insert(2, "place", 4 ,allow_duplicates=False)
+                df_datfiles_list_newcolumn.append(df_temporary)  
+
+        # Delete useless columns
+    index_columns = [[3,4,5,6]]*length_datfiles_list
+    df_datfiles_deleted_columns_list = list(map(DataManagment.delete_columns_by_index, df_datfiles_list_newcolumn, index_columns))
+    
+    # If there's more than one file
+    if length_datfiles_list > 1:
+        for i in range(length_datfiles_list - 1):
+            if df is None:
+                df = pd.concat([df_datfiles_deleted_columns_list[i], df_datfiles_deleted_columns_list[i+1]], ignore_index=True)
+            else:
+                df = pd.concat([df, df_datfiles_deleted_columns_list[i+1]], ignore_index=True)
+    else:
+        df = df_datfiles_deleted_columns_list[0]
+    
+    # Sort and creating nedded columns: "month"
+    df.columns = ["employee_id", "arrive_time", "location"]
+    df["arrive_time"] = pd.to_datetime(df["arrive_time"], format="%Y-%m-%d %H:%M:%S")
+        # Create month column: str | format: Str Month
+    df["month"] = df["arrive_time"].apply(lambda m: m.strftime("%B"))
+        # Create arrive_hour column: str | format = 00:00:00 AM/PM
+    df["arrive_hour"] = df["arrive_time"].apply(lambda d: d.time().strftime(format="%X %p"))
+        # Create date column: str | format: %Y-%m-%d
+    df["date"] = df["arrive_time"].apply(lambda d: d.date().strftime(format="%Y-%m-%d"))
+    
+    # df.info()
+    
+    # Save all data in the database
+    Assistance.save_assistance(df)
+    
+    return redirect(url_for("main")), 302
 
 
 @app.route("/logout")

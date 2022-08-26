@@ -1,5 +1,8 @@
+import pandas as pd
+
 from app import db
 from app import login_manager, app
+from datetime import datetime
 from flask_wtf import FlaskForm
 from flask_user import UserMixin
 from flask_user import UserManager
@@ -38,8 +41,8 @@ class RegisterForms(db.Model, UserMixin):
     last_name = db.Column(db.Unicode(50), nullable=False, server_default=u'')
 
     # Relationships
-    work_id = db.Column(db.Integer, db.ForeignKey("locations.id"))
-    role_id = db.Column(db.Integer,  db.ForeignKey("roles.id"))
+    work_id = db.Column(db.Integer(), db.ForeignKey("locations.id"))
+    role_id = db.Column(db.Integer(),  db.ForeignKey("roles.id"))
     
     def __repr__(self) -> str:
         return f'<User {self.first_name} {self.last_name}>'
@@ -78,7 +81,7 @@ class Role(db.Model):
 class Location(db.Model):
     __tablename__ = "locations"
     
-    id    = db.Column(db.Integer, primary_key=True)
+    id    = db.Column(db.Integer(), primary_key=True)
     place = db.Column(db.String(50), nullable=False,
                     server_default='',unique=True)
     users = db.relationship("RegisterForms", 
@@ -86,6 +89,9 @@ class Location(db.Model):
     locations = db.relationship("Employee", 
                             backref=db.backref("location"))
     
+    @classmethod
+    def get_all(cls):
+        return cls.query.all()
     # Create the Employee class with db.Model
 
 class Employee(db.Model):
@@ -94,12 +100,44 @@ class Employee(db.Model):
     """
     __tablename__ = "employee"
     
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer(), primary_key=True)
+    
+    employee_id = db.Column(db.Integer())
     first_name = db.Column(db.String(50), nullable=False)
     last_name = db.Column(db.String(50), nullable=False)
     
     # Relationship Fields
     location_id = db.Column(db.Integer, db.ForeignKey("locations.id"))
+    
+    @classmethod
+    def get_all(cls):
+        return cls.query.all()
+    
+
+class Assistance(db.Model):
+    """
+    Table to store the no completed assistance
+    """
+    
+    __tablename__ = "assistance"
+    
+    id = db.Column(db.Integer(), primary_key=True)
+    
+    employee_id = db.Column(db.Integer(), nullable=False)
+    arrive_time = db.Column(db.DateTime(), nullable=False)
+    location = db.Column(db.String(), nullable=False)
+    month = db.Column(db.String())
+    date = db.Column(db.String())
+    arrive_hour = db.Column(db.String(), nullable=False)
+    
+    @staticmethod
+    def save_assistance(df:pd.DataFrame):
+        # Erase all the data in the table
+        Assistance.query.delete()
+        db.session.commit()
+        
+        # As it's a df
+        df.to_sql(name="assistance", con=db.engine, if_exists="append", index=False)
 
 
 # Create Forms
@@ -129,16 +167,45 @@ class PageRegisterForm(FlaskForm):
                                         EqualTo("password_confirmer", message="Las contraseñas deben coincidir")])
     password_confirmer = PasswordField('Repeat Password')
     agree_to_terms = BooleanField('Agree to Terms', validators=[DataRequired()])
-    work_id = SelectField("Tienda", choices=[(1, "Oficina Principal"),
-                                            (2, "Tienda Nicollini"),
-                                            (3, "Tienda Ferretero")])
+    work_id = SelectField("Tienda", choices=[(2, "Oficina Principal"),
+                                            (3, "Tienda Nicollini"),
+                                            (4, "Tienda Ferretero")])
     register = SubmitField()
 
     # Create form for upload a file
 
 class FileLoader(FlaskForm):
-    file = FileField(label="Export")
+    file_oficina_principal = FileField(label="Oficina Principal")
+    file_nicollini = FileField(label="Tienda Nicollini")
+    file_ferretero = FileField(label="Tienda Ferretero")
     submit = SubmitField()
+
+
+# Get employees id from the database to use in the form selection
+with app.app_context():
+    employees = Employee.get_all()
+    choices_employee = [(0, "Todos")]
+    choices_employee_to_add = [(employee.employee_id, f"{employee.first_name} {employee.last_name}") for employee in employees]
+    choices_employee.extend(choices_employee_to_add)
+    
+
+# Get locations id from the database to use in the form selection
+with app.app_context():
+    locations = Location.get_all()
+    choices_location = [(0, "Todos")]
+    choices_employee_to_add = [(location.id, location.place) for location in locations]
+    choices_location.extend(choices_employee_to_add)
+
+class FilterForm(FlaskForm):
+    employee_name = SelectField("Empleado", choices=choices_employee, default=0)
+    location = SelectField("Tienda", choices=choices_location, default=0)
+    month = SelectField("Mes", choices=[(1, "January"), (2, "February"), (3, "March"), 
+                                        (4, "April"), (5, "May"), (6, "June"), 
+                                        (7, "July"), (8, "August"), (9, "September"), 
+                                        (10, "October"), (11, "November"), (12, "Dicember")], 
+                                default=datetime.now().month)
+    submit = SubmitField()
+
 
 # Configurations
 

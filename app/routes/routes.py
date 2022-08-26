@@ -131,23 +131,18 @@ def main():
         month_sent = [value for name, value in DICC_MONTHS.items() if int(filter_form.month.data)==name]
 
         if int(filter_form.employee_name.data) == 0 and int(filter_form.location.data) == 0:
-            print(month_sent)
             table_assistance = table_assistance.loc[(table_assistance["month"] == month_sent[0])]
-            print(table_assistance)
             return render_template('main/main.html', form=form, filter_form=filter_form , table=table_assistance), 200
         
         if int(filter_form.employee_name.data) == 0:
             table_assistance = table_assistance.loc[(table_assistance["location"] == location_sent[0]) & (table_assistance["month"] == month_sent[0])]
-            print(table_assistance)
             return render_template('main/main.html', form=form, filter_form=filter_form , table=table_assistance), 200
         
         if int(filter_form.location.data) == 0:
             table_assistance = table_assistance.loc[(table_assistance["employee_id"] == int(filter_form.employee_name.data)) & (table_assistance["month"] == month_sent[0])]
-            print(table_assistance)
             return render_template('main/main.html', form=form, filter_form=filter_form , table=table_assistance), 200
         
         table_assistance = table_assistance.loc[(table_assistance["employee_id"] == int(filter_form.employee_name.data)) & (table_assistance["location"] == location_sent[0]) & (table_assistance["month"] == month_sent[0])]
-        print(table_assistance)
     
     return render_template('main/main.html', form=form, filter_form=filter_form , table=table_assistance), 200
 

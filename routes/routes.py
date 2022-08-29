@@ -144,6 +144,8 @@ def main():
         
         table_assistance = table_assistance.loc[(table_assistance["employee_id"] == int(filter_form.employee_name.data)) & (table_assistance["location"] == location_sent[0]) & (table_assistance["month"] == month_sent[0])]
     
+    table_assistance.to_excel(FILES_DIR/"data.xlsx")
+
     return render_template('main/main.html', form=form, filter_form=filter_form , table=table_assistance), 200
 
 @app.route('/file-added', methods=["POST"])

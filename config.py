@@ -3,6 +3,8 @@ Module containing the configuration for the application.
 """
 import os
 
+
+# App Flask Config
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY')
     USER_ENABLE_EMAIL = False
@@ -33,4 +35,13 @@ config = {
     "testing":TestingConfig,
     "production":ProductionConfig,
     "default":DevelopmentConfig
+}
+
+# Connection PostgreSQL
+
+keepalive_kwargs = {
+    "keepalives": 1,
+    "keepalives_idle": 60,
+    "keepalives_interval": 10,
+    "keepalives_count": 5
 }

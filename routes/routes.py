@@ -204,7 +204,7 @@ def file_added():
             else:
                 flash("""There was an error uploading files. Please try again\n
                         If the error persists, contact support.""")
-                raise BaseException(f"Failed to remove items from path: {FILES_DIR}")
+                return render_template(url_for("main"))
 
         # If it does not exist any file
         if files is None:

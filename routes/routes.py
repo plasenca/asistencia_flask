@@ -204,7 +204,7 @@ def file_added():
             else:
                 flash("""There was an error uploading files. Please try again\n
                         If the error persists, contact support.""")
-                return redirect(url_for("main"))
+                return redirect(url_for("main")), 302
 
         # If it does not exist any file
         if files is None:

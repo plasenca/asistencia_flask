@@ -117,4 +117,5 @@ COPY production.env .env
 
 RUN pip install -r requirements.txt
 
+EXPOSE 38461
 CMD ["uwsgi","--ini", "uwsgi.ini"]

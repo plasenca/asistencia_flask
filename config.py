@@ -29,6 +29,8 @@ class ProductionConfig(Config):
     FLASK_ENV = 'production'
     DEBUG = os.environ.get('DEBUG_PROD')
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
+    FLASK_RUN_PORT = os.environ.get('FLASK_RUN_PORT')
+    FLASK_RUN_HOST = os.environ.get('FLASK_RUN_HOST')
     print('ProductionConfig'.center(80, '-'))
 
 config = {

@@ -197,7 +197,7 @@ class FilterForm(FlaskForm):
         choices_employee_to_add = [(location.id, location.place) for location in locations]
         choices_location.extend(choices_employee_to_add)
 
-    employee_name = SelectField("Empleado", choices=choices_employee, default=0)
+    employee_name = SelectField("Empleado", choices=choices_employee, default=9)
     location = SelectField("Tienda", choices=choices_location, default=0)
     month = SelectField("Mes", choices=[(1, "January"), (2, "February"), (3, "March"), 
                                         (4, "April"), (5, "May"), (6, "June"), 

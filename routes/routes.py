@@ -19,7 +19,6 @@ from flask_login import login_user
 from flask_login import current_user
 from flask_login import logout_user
 from flask_login import login_required
-from werkzeug.utils import secure_filename
 from models.models import FileLoader
 from models.models import Assistance
 from models.models import FilterForm
@@ -117,7 +116,9 @@ def main():
     table_assistance = db.session.execute(query).all()
     table_assistance = pd.DataFrame(table_assistance, columns=["employee_id", "first_name", "last_name", "full_name", "location", "month", "arrive_hour", "date"])
     table_assistance["arrive_time"] = table_assistance["arrive_hour"].apply(lambda x: datetime.datetime.strptime(x, "%X %p"))
-    print(table_assistance)
+    
+    # Define a default dataframe for not showing all data.
+    table_assistance_default = table_assistance.loc[(table_assistance["employee_id"] == int(filter_form.employee_name.default))]
     
     if request.method == "POST":
     # Get any filter table
@@ -143,10 +144,10 @@ def main():
             return render_template('main/main.html', form=form, filter_form=filter_form , table=table_assistance), 200
         
         table_assistance = table_assistance.loc[(table_assistance["employee_id"] == int(filter_form.employee_name.data)) & (table_assistance["location"] == location_sent[0]) & (table_assistance["month"] == month_sent[0])]
+        
+        return render_template('main/main.html', form=form, filter_form=filter_form , table=table_assistance), 200
     
-    table_assistance.to_excel(FILES_DIR/"data.xlsx")
-
-    return render_template('main/main.html', form=form, filter_form=filter_form , table=table_assistance), 200
+    return render_template('main/main.html', form=form, filter_form=filter_form , table=table_assistance_default), 200
 
 @app.route('/file-added', methods=["POST"])
 @login_required

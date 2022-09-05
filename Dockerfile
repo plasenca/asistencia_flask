@@ -112,8 +112,9 @@ RUN set -eux; \
 	pip --version
 
 
-COPY . /app
+COPY . .
+COPY production.env .env
 
-RUN pip install -r app/requirements.txt
+RUN pip install -r requirements.txt
 
-CMD ["flask", "run", "--host=0.0.0.0" ,"--port=4000"]
+CMD ["uwsgi","--ini", "uwsgi.ini"]

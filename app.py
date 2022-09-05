@@ -32,3 +32,6 @@ migrate = Migrate(app, db)
 
 # Importing Routes
 from routes.routes import *
+
+
+application = app

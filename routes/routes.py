@@ -117,6 +117,7 @@ def main():
     table_assistance = pd.DataFrame(table_assistance, columns=["employee_id", "first_name", "last_name", "full_name", "location", "month", "arrive_hour", "date"])
     table_assistance["arrive_time"] = table_assistance["arrive_hour"].apply(lambda x: datetime.datetime.strptime(x, "%X %p"))
     
+    table_assistance.to_excel(f"{FILES_DIR}/data.xlsx")
     # Define a default dataframe for not showing all data.
     table_assistance_default = table_assistance.loc[(table_assistance["employee_id"] == int(filter_form.employee_name.default))]
     
@@ -273,10 +274,22 @@ def dat_converter():
         # Create arrive_hour column: str | format = 00:00:00 AM/PM
     df["arrive_hour"] = df["arrive_time"].apply(lambda d: d.time().strftime(format="%X %p"))
         # Create date column: str | format: %Y-%m-%d
-    df["date"] = df["arrive_time"].apply(lambda d: d.date().strftime(format="%Y-%m-%d"))
+    df["date"] = df["arrive_time"].apply(lambda d: d.date().strftime(format="%d-%m-%Y"))
     
-    # df.info()
+    # Split data for change values
+    data_to_change = df.loc[df["employee_id"]==13]
+    df.drop(df[df["employee_id"]==13].index, inplace=True)
     
+    data_to_change["arrive_hour"] = data_to_change["arrive_hour"].apply(DataConverter._change_values)
+    
+    data_to_change.reset_index(inplace=True)
+    df.reset_index(inplace=True)
+    
+    # Concat Dataframes
+    df = pd.concat([df,data_to_change], axis=0)
+    df.drop(["index"],axis=1 , inplace=True)
+    
+    # antes pensaba en que iba a defraudar a mi padre por no seguir su carrera: electrónica*
     # Save all data in the database
     Assistance.save_assistance(df)
     
@@ -312,7 +325,12 @@ def date_filter(s, format):
 def month_filter(s):
     return datetime.datetime.strftime(s, "%B")
 
-    # 
+    # Custom filter to strip a str
 @app.template_filter("strip")
 def str_strip(s:str):
     return s.strip()
+
+    # Custom filter to get the actual time
+@app.template_filter("now")
+def now_time(s):
+    return datetime.datetime.now().strftime("%H_%M_%S__%d_%m_%Y")

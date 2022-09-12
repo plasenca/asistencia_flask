@@ -130,10 +130,13 @@ class Assistance(db.Model):
     date = db.Column(db.String())
     arrive_hour = db.Column(db.String(), nullable=False)
     
-    @staticmethod
-    def save_assistance(df:pd.DataFrame):
+    @classmethod
+    def save_assistance(cls, df:pd.DataFrame):
         # Erase all the data in the table
         Assistance.query.delete()
+        # Reset Index
+        query = f"ALTER SEQUENCE {cls.__tablename__}_id_seq RESTART WITH 1;"
+        db.session.execute(query)
         db.session.commit()
         
         # As it's a df

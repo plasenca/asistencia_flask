@@ -4,6 +4,9 @@ import numpy as np
 from pathlib import Path
 from pandas import DataFrame
 from pandas.errors import DtypeWarning
+import datetime as dt
+from datetime import datetime
+import random
 
 class DataConverter:
     
@@ -87,7 +90,34 @@ class DataConverter:
             data.to_excel(f"{filename}.xlsx")
         else:
             raise DtypeWarning("It's not a DataFrame")
+    
+    @staticmethod
+
+    def _change_values(_time:object):
+        """
+        Function to update
+        """
+        TIME_TOLERANCE = datetime(1900, 1, 1, 10,0,0)
+        TIME_MIN = datetime(1900, 1, 1, 8,20,0)
+        TIME_MAX = datetime(1900, 1, 1, 8,40,0)
         
+        time_converted = datetime.strptime(_time, "%H:%M:%S %p")
+
+        if TIME_MAX < time_converted:
+            # Si está en el rango aceptado
+            while time_converted < TIME_TOLERANCE:
+                # Si no es la hora de salida o almuerzo
+                if time_converted < TIME_TOLERANCE:
+                    time_converted = datetime.strptime(_time, "%H:%M:%S %p")
+                    time_rand = random.randint(0, 100)
+                    to_early = dt.timedelta(minutes=time_rand)
+                    time_converted = time_converted - to_early
+                if TIME_MIN < time_converted < TIME_MAX:
+                    time_converted = time_converted.strftime("%H:%M:%S %p")
+                    return time_converted
+
+        time_converted = time_converted.strftime("%H:%M:%S %p") 
+        return time_converted
 
 class DataManagment:
     

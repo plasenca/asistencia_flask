@@ -127,6 +127,12 @@ def main():
         filter_form.employee_name.default = filter_form.employee_name.data
         filter_form.location.default = filter_form.location.data
         filter_form.month.default = filter_form.month.data
+        print(f"""Valores Filtro:\n Valor 'employee_name':{filter_form.employee_name.data}\n Valor 'location':{filter_form.location.data}\n Valor 'month':{filter_form.month.data}""")
+        
+        if filter_form.employee_name.data == "None":
+            table_assistance = table_assistance.loc[table_assistance["employee_id"]=="None"]
+            return render_template('main/main.html', form=form, filter_form=filter_form , table=table_assistance), 200
+        
         # Filter table by the form sent by the user
             # Convert values sent by user to values soported
         location_sent = [value for name, value in LOCATIONS.items() if int(filter_form.location.data)==name]

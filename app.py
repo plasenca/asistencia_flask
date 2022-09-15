@@ -38,4 +38,5 @@ migrate = Migrate(app, db)
 from routes.routes import *
 
 
+# Configuration for WSGI
 application = app

@@ -3,7 +3,9 @@ Module containing the configuration for the application.
 """
 import os
 
+from dotenv import load_dotenv
 
+load_dotenv()
 # App Flask Config
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY')
@@ -11,7 +13,6 @@ class Config:
     UPLOAD_FOLDER = "static/files"
     SQLALCHEMY_TRACK_MODIFICATIONS = os.environ.get('SQLALCHEMY_TRACK_MODIFICATIONS')
     FLASK_APP= os.environ.get('FLASK_APP')
-    DEBUG = False
 
 class DevelopmentConfig(Config):
     DEBUG = os.environ.get('DEBUG')

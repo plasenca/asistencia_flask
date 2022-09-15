@@ -193,7 +193,7 @@ class FilterForm(FlaskForm):
         choices_employee.extend(choices_employee_to_add)
     
 
-# # Get locations id from the database to use in the form selection
+    # Get locations id from the database to use in the form selection
     with app.app_context():
         locations = Location.get_all()
         choices_location = [(0, "Todos")]

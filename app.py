@@ -1,5 +1,6 @@
 from flask import Flask
 from config import config
+from flask_cors import CORS
 from flask_moment import Moment
 from flask_migrate import Migrate
 from flask_login import LoginManager
@@ -10,6 +11,9 @@ from flask_sqlalchemy import SQLAlchemy
 app = Flask(__name__)
 # Setting configuration
 app.config.from_object(config["production"])
+
+# Available CORS
+CORS(app)
 
 # Incializa el login manager
 login_manager = LoginManager()
